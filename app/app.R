@@ -1,93 +1,81 @@
-
-
 library(shiny)
-
-# Define UI for random distribution app ----
+ 
+# Define UI for CHEMTAX app ----
 ui <- fluidPage(
-  
   # App title ----
-  titlePanel("Tabsets"),
-  
+  titlePanel("CHEMTAX-R Shiny GUI"),
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
-    
     # Sidebar panel for inputs ----
     sidebarPanel(
-      
-      # Input: Select the random distribution type ----
-      radioButtons("dist", "Distribution type:",
-                   c("Normal" = "norm",
-                     "Uniform" = "unif",
-                     "Log-normal" = "lnorm",
-                     "Exponential" = "exp")),
-      
-      # br() element to introduce extra vertical spacing ----
-      br(),
-      
-      # Input: Slider for the number of observations to generate ----
-      sliderInput("n",
-                  "Number of observations:",
-                  value = 500,
-                  min = 1,
-                  max = 1000)
-      
+      # one sample per row, one pigment per column
+      fileInput("pigments_file", "samples pigment data table",
+                multiple = FALSE,
+                accept = c("text/csv",
+                           "text/comma-separated-values,text/plain",
+                           ".csv")),
+      # Horizontal line ----
+      tags$hr(),
+      fileInput("taxalist_file", "list of taxa present",
+                multiple = FALSE,
+                accept = c("text/csv",
+                           "text/comma-separated-values,text/plain",
+                           ".csv")),
     ),
-    
     # Main panel for displaying outputs ----
     mainPanel(
-      
-      # Output: Tabset w/ plot, summary, and table ----
+      # Output: Tabset  ----
       tabsetPanel(type = "tabs",
-                  tabPanel("Plot", plotOutput("plot")),
-                  tabPanel("Summary", verbatimTextOutput("summary")),
-                  tabPanel("Table", tableOutput("table"))
+        tabPanel(
+          "Load Files",
+          tableOutput("pigments_table"),
+          tableOutput("taxalist_table")),
+        tabPanel(
+          "Perform RMS (TODO)", 
+          verbatimTextOutput("summary")),
+        tabPanel(
+          "Result (TODO)", 
+          tableOutput("table"))
       )
-      
     )
   )
 )
 
-# Define server logic for random distribution app ----
+# Helper functions ----
+get_df_from_file <- function(filepath){
+  # function to read the taxalist & pigment csv files.
+  tryCatch({
+    # when reading semicolon separated files,
+    # having a comma separator causes `read.csv` to error
+      df <- read.csv(filepath,
+                     header = TRUE,
+                     sep = ',',
+                     quote = '"')
+    },
+    error = function(e) {
+      # return a safeError if a parsing error occurs
+      stop(safeError(e))
+    }
+  )
+  return(df)
+}
+
+# Define server logic for app ----
 server <- function(input, output) {
-  
-  # Reactive expression to generate the requested distribution ----
-  # This is called whenever the inputs change. The output functions
-  # defined below then use the value computed from this expression
-  d <- reactive({
-    dist <- switch(input$dist,
-                   norm = rnorm,
-                   unif = runif,
-                   lnorm = rlnorm,
-                   exp = rexp,
-                   rnorm)
+  output$pigments_table <- renderTable({
+    req(input$pigments_file)
+
+    pigment_df <- get_df_from_file(input$pigments_file$datapath)
+
+    return(head(pigment_df))
+  })
+  output$taxalist_table <- renderTable({
+    req(input$taxalist_file)
     
-    dist(input$n)
-  })
-  
-  # Generate a plot of the data ----
-  # Also uses the inputs to build the plot label. Note that the
-  # dependencies on the inputs and the data reactive expression are
-  # both tracked, and all expressions are called in the sequence
-  # implied by the dependency graph.
-  output$plot <- renderPlot({
-    dist <- input$dist
-    n <- input$n
+    taxalist_df <- get_df_from_file(input$taxalist_file$datapath)
     
-    hist(d(),
-         main = paste("r", dist, "(", n, ")", sep = ""),
-         col = "#75AADB", border = "white")
+    return(head(taxalist_df))
   })
-  
-  # Generate a summary of the data ----
-  output$summary <- renderPrint({
-    summary(d())
-  })
-  
-  # Generate an HTML table view of the data ----
-  output$table <- renderTable({
-    d()
-  })
-  
 }
 
 # Create Shiny app ----
