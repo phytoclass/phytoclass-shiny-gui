@@ -1,5 +1,5 @@
 library(shiny)
- 
+
 # Define UI for CHEMTAX app ----
 ui <- fluidPage(
   # App title ----
@@ -9,7 +9,7 @@ ui <- fluidPage(
     # Sidebar panel for inputs ----
     sidebarPanel(
       # one sample per row, one pigment per column
-      fileInput("pigments_file", "samples pigment data table",
+      fileInput("pigments_file", "pigment ratios per sample .csv",
                 multiple = FALSE,
                 accept = c("text/csv",
                            "text/comma-separated-values,text/plain",
@@ -31,10 +31,10 @@ ui <- fluidPage(
           tableOutput("pigments_table"),
           tableOutput("taxalist_table")),
         tabPanel(
-          "Perform RMS (TODO)", 
+          "Perform RMS (TODO)",
           verbatimTextOutput("summary")),
         tabPanel(
-          "Result (TODO)", 
+          "Result (TODO)",
           tableOutput("table"))
       )
     )
@@ -71,9 +71,9 @@ server <- function(input, output) {
   })
   output$taxalist_table <- renderTable({
     req(input$taxalist_file)
-    
+
     taxalist_df <- get_df_from_file(input$taxalist_file$datapath)
-    
+
     return(head(taxalist_df))
   })
 }
