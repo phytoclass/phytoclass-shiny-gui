@@ -8,28 +8,47 @@ ui <- fluidPage(
   sidebarLayout(
     # Sidebar panel for inputs ----
     sidebarPanel(
-      # one sample per row, one pigment per column
-      fileInput("pigments_file", "pigment ratios per sample .csv",
-                multiple = FALSE,
-                accept = c("text/csv",
-                           "text/comma-separated-values,text/plain",
-                           ".csv")),
-      # Horizontal line ----
-      tags$hr(),
-      fileInput("taxalist_file", "list of taxa present",
-                multiple = FALSE,
-                accept = c("text/csv",
-                           "text/comma-separated-values,text/plain",
-                           ".csv")),
+      tabsetPanel(type = "tabs",
+        tabPanel("Input Files",
+          markdown("
+           # Pigment Sample Matrix
+           Select a pigment ratios file.
+           One sample per row, one pigment per column.
+           **NOTE: Not Yet Implemented.**
+           "
+          ),
+          fileInput("pigments_file", "Pigments .csv file",
+                    multiple = FALSE,
+                    accept = c("text/csv",
+                               "text/comma-separated-values,text/plain",
+                               ".csv")),
+          textOutput("pigmentsFileStatusText"),
+          tags$hr(),  # Horizontal line ------------------------------------
+          markdown("
+            # Taxa list
+            List of taxa expected in the sample.
+            **NOTE: Not Yet Implemented.**
+          "),
+          fileInput("taxalist_file", "List of taxa .csv file.",
+            multiple = FALSE,
+            accept = c("text/csv",
+                       "text/comma-separated-values,text/plain",
+                       ".csv")
+          ),
+          textOutput("taxalistFileStatusText"),
+          tags$hr(),  # Horizontal line ------------------------------------
+        )
+      ),
     ),
     # Main panel for displaying outputs ----
     mainPanel(
       # Output: Tabset  ----
       tabsetPanel(type = "tabs",
         tabPanel(
-          "Load Files",
-          tableOutput("pigments_table"),
-          tableOutput("taxalist_table")),
+          "Clustering",
+          markdown("NOTE: clustering output is not yet implemented"),
+          plotOutput("clusterDendrogram")
+        ),
         tabPanel(
           "Perform RMS (TODO)",
           verbatimTextOutput("summary")),
@@ -62,19 +81,31 @@ get_df_from_file <- function(filepath){
 
 # Define server logic for app ----
 server <- function(input, output) {
-  output$pigments_table <- renderTable({
+  pigmentsDF <- reactiveVal(NULL)
+
+  output$pigmentsFileStatusText <- renderText({
     req(input$pigments_file)
-
     pigment_df <- get_df_from_file(input$pigments_file$datapath)
-
-    return(head(pigment_df))
+   # TODO: validate
+    pigmentsDF(pigment_df)
+    return("File loaded.")
   })
-  output$taxalist_table <- renderTable({
+
+  output$taxalistFileStatusText <- renderText({
     req(input$taxalist_file)
-
     taxalist_df <- get_df_from_file(input$taxalist_file$datapath)
+    # TODO: validate
+    return("File loaded.")
+  })
 
-    return(head(taxalist_df))
+  output$clusterDendrogram <- renderPlot({
+    # req(input$pigments_file)
+    if(!is.null(pigmentsDF())){
+      Cluster.result <- phytoclass::Cluster(pigmentsDF(), 14)
+      Cluster.result$cluster.list
+      # plot of clusters
+      return(plot(Cluster.result$cluster.plot))
+    }  # TODO: else show not yet loaded
   })
 }
 
