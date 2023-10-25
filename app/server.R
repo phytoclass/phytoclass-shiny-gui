@@ -56,7 +56,9 @@ server <- function(input, output) {
     result <- phytoclass::Cluster(pigments_df, 14)
     # result$cluster.list
     # plot of clusters
+    log_trace("cluster result len: {nrow(result)}")
     clusterResult(result)
+    log_trace("cluster result len: {nrow(clusterResult())}")
     clusterSelectStatus("clustering complete")
   }
 
@@ -104,6 +106,16 @@ server <- function(input, output) {
     return(plot(clusterResult()$cluster.plot))
   })
 
+  output$nClusters <- renderText({
+    req(selectedCluster())
+    req(clusterResult())
+    return(nrow(clusterResult()$cluster.list))
+  })
+  output$clusterSize <- renderText({
+    req(selectedCluster())
+    req(clusterResult())
+    return(nrow(clusterResult()$cluster.list[[selectedCluster()]]))
+  })
 
   # === annealing run =========================================================
   annealingStatus <- reactiveVal("Not Started")

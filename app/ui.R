@@ -53,6 +53,8 @@ ui <- fluidPage(
         tabPanel(
           "Clustering",
           plotOutput("clusterDendrogram"),
+          markdown("**clusterSize**"), textOutput("clusterSize", inline=TRUE),
+          markdown("**nClusters**"), textOutput("nClusters", inline=TRUE),
           textInput("clusterSelector", "selected cluster", 1),
         ),
         tabPanel(
