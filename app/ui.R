@@ -57,7 +57,8 @@ ui <- fluidPage(
         ),
         tabPanel(
           "Simulated Annealing",
-          verbatimTextOutput("summary")),
+          plotOutput("annealingPlot"),
+          verbatimTextOutput("annealingSummary")),
         tabPanel(
           "Result (TODO)",
           tableOutput("table")),
