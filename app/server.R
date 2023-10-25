@@ -1,5 +1,6 @@
 # Define UI for CHEMTAX app ----
 library("glue")
+library("logger")
 # Helper functions ----
 get_df_from_file <- function(filepath){
   # function to read the taxalist & pigment csv files.
@@ -68,10 +69,13 @@ server <- function(input, output) {
   observeEvent(input$clusterSelector, {
     selectedValue <- input$clusterSelector
     # validate
-    if(nrow(clusterResult()$cluster.list) < 1){
+
+    if(!is.null(clusterResult()) && clusterResult()$cluster.list < 1){
       clusterSelectStatus("clustering not yet applied")
     } else {
-      print(nrow(clusterResult()$cluster.list))
+      log_info(glue(
+        "selected cluster {clusterResult()$cluster.list}"
+      ))
       if(selectedValue < 1){  # TODO: also check upper bound
         clusterSelectStatus("bad cluster selection value")
       } else {
@@ -90,9 +94,9 @@ server <- function(input, output) {
       result <- phytoclass::Cluster(pigmentsDF(), 14)
       result$cluster.list
       # plot of clusters
+      clusterResult(result)
       return(plot(result$cluster.plot))
     }  # TODO: else show not yet loaded
-    clusterResult(result)
   })
 
 
