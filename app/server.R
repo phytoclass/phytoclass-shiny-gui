@@ -27,13 +27,10 @@ get_df_from_file <- function(filepath){
 server <- function(input, output) {
   # === pigments DF setup & status ============================================
   pigmentsDF <- reactiveVal(NULL)
-
   pigmentsFileStatus <- reactiveVal("pigments csv needed")
-  output$pigmentsFileStatusText <- renderText({pigmentsFileStatus()})
+  clusterResult <- reactiveVal()
 
-  observe({
-    log_trace(glue("n_pigment_samples:{nrow(pigmentsDF())}"))
-  })
+  output$pigmentsFileStatusText <- renderText({pigmentsFileStatus()})
 
   observeEvent(input$pigments_file, {
     log_trace("pigment file changed")
@@ -57,13 +54,12 @@ server <- function(input, output) {
     log_trace("running clustering")
     clusterSelectStatus("running clustering...")
     result <- phytoclass::Cluster(pigments_df, 14)
-    result$cluster.list
+    # result$cluster.list
     # plot of clusters
     clusterResult(result)
     clusterSelectStatus("clustering complete")
   }
 
-  clusterResult <- reactiveVal()
   observe({runClustering(pigmentsDF())})
 
 
@@ -92,9 +88,9 @@ server <- function(input, output) {
   observeEvent(input$clusterSelector, {
     selectedValue <- input$clusterSelector
     # validate
-    log_info(glue(
-      "selected cluster {clusterResult()$cluster.list}"
-    ))
+    # log_info(glue(
+    #   "selected cluster of size {nrow(clusterResult()$cluster.list[[selectedValue]])}"
+    # ))
     if(selectedValue < 1){  # TODO: also check upper bound
       clusterSelectStatus("bad cluster selection value")
     } else {
@@ -118,24 +114,28 @@ server <- function(input, output) {
   #
   # })
 
-  observeEvent(clusterResult, {
+  observe({
     annealingStatus("awaiting cluster input")
-    req(pigmentsDF())
-    #req(taxalistDF())
     req(clusterResult())
     req(selectedCluster())
-    annealingStatus("running...")
-
+    annealingStatus(glue("extracting cluster #{selectedCluster()}"))
     Clust1 <- clusterResult()$cluster.list[[selectedCluster()]]
-    # Remove the cluster column/label
+    log_trace(glue("cluster # {selectedCluster()}:"))
+    log_trace(Clust1)
+    log_trace("Remove cluster column/label")
     Clust1$Clust <- NULL
+    log_trace("selected cluster:")
+    log_trace(Clust1)
 
+    req(Clust1)
+    annealingStatus("running...")
     set.seed("7683")  # TODO: set seet in UI
-    Results <- simulated_annealing(Clust1, niter = 1)
+    Results <- phytoclass::simulated_annealing(Clust1, niter = 1)
     annealingStatus(glue("
      completed w/ RMSE {Results$RMSE}
    "))
     annealingResult(Results)
+    log_trace("annealing complete")
   })
 
   output$annealingSummary <- renderText({
