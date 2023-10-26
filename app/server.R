@@ -131,18 +131,26 @@ server <- function(input, output) {
     req(clusterResult())
     req(selectedCluster())
     annealingStatus(glue("extracting cluster #{selectedCluster()}"))
-    Clust1 <- clusterResult()$cluster.list[[selectedCluster()]]
+    Clust1 <- clusterResult()$cluster.list[[
+      as.numeric(selectedCluster())
+    ]]
     log_trace(glue("cluster # {selectedCluster()}:"))
-    log_trace(Clust1)
+    # log_trace(Clust1)
     log_trace("Remove cluster column/label")
     Clust1$Clust <- NULL
     log_trace("selected cluster:")
-    log_trace(Clust1)
+    log_trace(nrow(Clust1))
 
     req(Clust1)
     annealingStatus("running...")
-    set.seed("7683")  # TODO: set seet in UI
-    Results <- phytoclass::simulated_annealing(Clust1, niter = 1)
+    log_trace("annealing...")
+    set.seed("7683")  # TODO: set set in UI
+    # TODO: can we print temp to the UI from the console
+    Results <- phytoclass::simulated_annealing(
+      Clust1,
+      niter = 1
+    )
+
     annealingStatus(glue("
      completed w/ RMSE {Results$RMSE}
    "))

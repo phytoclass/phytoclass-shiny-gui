@@ -6,13 +6,17 @@ ui <- fluidPage(
     # Sidebar panel for inputs ----
     sidebarPanel(
       tabsetPanel(type = "tabs",
-        tabPanel("checklist",
+        # TODO: add config section w/ random_seed, other inputs to function calls
+        tabPanel("config",
+          markdown("TODO"),
+          # TODO: include phytoclass::min_max values here?
+        ),
+        tabPanel("status",
         tags$hr(),  # Horizontal line ------------------------------------
           markdown("**pigments**"), textOutput("pigmentsFileStatusText"),
         tags$hr(),  # Horizontal line ------------------------------------
           markdown("**taxa list**"), textOutput("taxalistFileStatusText"),
         tags$hr(),  # Horizontal line ------------------------------------
-          # TODO:
           markdown("**cluster**"), textOutput("clusterSelectStatusText"),
           tags$hr(),  # Horizontal line ------------------------------------
           markdown("**annealing**"), textOutput("annealingStatusText"),
