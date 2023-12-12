@@ -43,7 +43,7 @@ ui <- fluidPage(
           markdown("
           # Pigment Sample Matrix
           Select a pigment ratios file.
-          [See here for details](https://github.com/USF-IMARS/chemtax-shiny-gui/rmd/pigment_matrix)
+          [See here for details]https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/pigment_matrix.Rmd)
           "),
           fileInput("pigments_file", "Pigments .csv file",
                     multiple = FALSE,
