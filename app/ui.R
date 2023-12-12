@@ -1,15 +1,26 @@
 ui <- fluidPage(
   # App title ----
-  titlePanel("CHEMTAX-R Shiny GUI"),
+  titlePanel("Phytoplankton-From-Pigments GUI"),
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
     # Sidebar panel for inputs ----
     sidebarPanel(
       tabsetPanel(type = "tabs",
-        # TODO: add config section w/ random_seed, other inputs to function calls
+        tabPanel("about",
+          markdown("
+            This tool uses the [phytoclass R library](https://cran.r-project.org/web/packages/phytoclass/index.html) to estimate phytoplankton community composition from pigment data.
+
+            ## How to Cite
+            TODO
+
+            ## Feedback
+            Share your thoughts and report bugs by creating a new issue in the [issue tracker](https://github.com/USF-IMARS/chemtax-shiny-gui/issues).
+            Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
+          ")
+        ),
         tabPanel("config",
-          markdown("TODO"),
-          # TODO: include phytoclass::min_max values here?
+          markdown("Configuration text `key=value` lines here. One per line. Use `#` for comments."),
+          textAreaInput("configText", "configuration text"),
         ),
         tabPanel("status",
         tags$hr(),  # Horizontal line ------------------------------------
@@ -32,8 +43,7 @@ ui <- fluidPage(
           markdown("
           # Pigment Sample Matrix
           Select a pigment ratios file.
-          One sample per row, one pigment per column.
-          **NOTE: Not Yet Implemented.**
+          [See here for details](https://github.com/USF-IMARS/chemtax-shiny-gui/rmd/pigment_matrix)
           "),
           fileInput("pigments_file", "Pigments .csv file",
                     multiple = FALSE,
@@ -64,10 +74,8 @@ ui <- fluidPage(
         tabPanel(
           "Simulated Annealing",
           plotOutput("annealingPlot"),
-          verbatimTextOutput("annealingSummary")),
-        tabPanel(
-          "Result (TODO)",
-          tableOutput("table")),
+          verbatimTextOutput("annealingSummary")
+        ),
       )
     )
   )
