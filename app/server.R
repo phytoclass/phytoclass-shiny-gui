@@ -148,7 +148,7 @@ server <- function(input, output) {
     # TODO: can we print temp to the UI from the console
     Results <- phytoclass::simulated_annealing(
       Clust1,
-      niter = 1
+      niter = 300  # number of iterations
     )
 
     annealingStatus(glue("
