@@ -1,5 +1,5 @@
 The pigment matrix files should include one sample per row and one pigment per column.
 
-An example pigment matrix file can be found in [sample_data/sm.csv](sample_data/sm.csv).
+An example pigment matrix file can be found in [sample_data/sm.csv](https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/sample_data/sm.csv).
 
 Detailed information on the create of a pigment matrix can be found in the [phytoclass documentation]( https://cran.r-project.org/web/packages/phytoclass/vignettes/phytoclass-vignette.html)
