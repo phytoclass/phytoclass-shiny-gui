@@ -53,7 +53,10 @@ server <- function(input, output) {
     req(pigments_df)
     log_trace("running clustering")
     clusterSelectStatus("running clustering...")
-    result <- phytoclass::Cluster(pigments_df, 14)
+    result <- phytoclass::Cluster(
+      pigments_df,
+      14  # min_cluster_size
+    )
     # result$cluster.list
     # plot of clusters
     log_trace("cluster result len: {nrow(result)}")
@@ -149,6 +152,9 @@ server <- function(input, output) {
     Results <- phytoclass::simulated_annealing(
       Clust1,
       niter = 300  # number of iterations
+      # user_defined_min_max = minMaxTable
+      # TODO: place to upload table to replace
+      #       phytoclass::min_max table
     )
 
     annealingStatus(glue("

@@ -1,6 +1,6 @@
 ui <- fluidPage(
   # App title ----
-  titlePanel("Phytoplankton-From-Pigments GUI"),
+  titlePanel("Phytoplankton-From-Pigments GUI v0.0.3"),
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
     # Sidebar panel for inputs ----
@@ -23,11 +23,11 @@ ui <- fluidPage(
           textAreaInput("configText", "configuration text"),
         ),
         tabPanel("status",
-        tags$hr(),  # Horizontal line ------------------------------------
+          tags$hr(),  # Horizontal line ------------------------------------
           markdown("**pigments**"), textOutput("pigmentsFileStatusText"),
-        tags$hr(),  # Horizontal line ------------------------------------
+          tags$hr(),  # Horizontal line ------------------------------------
           markdown("**taxa list**"), textOutput("taxalistFileStatusText"),
-        tags$hr(),  # Horizontal line ------------------------------------
+          tags$hr(),  # Horizontal line ------------------------------------
           markdown("**cluster**"), textOutput("clusterSelectStatusText"),
           tags$hr(),  # Horizontal line ------------------------------------
           markdown("**annealing**"), textOutput("annealingStatusText"),
@@ -42,7 +42,7 @@ ui <- fluidPage(
         tabPanel("Input Files",
           markdown("
           # Pigment Sample Matrix
-          Select a pigment ratios file.
+          Select a pigment concentrations file.
           [See here for details](https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/pigment_matrix.Rmd)
           "),
           fileInput("pigments_file", "Pigments .csv file",
@@ -62,19 +62,33 @@ ui <- fluidPage(
                        "text/comma-separated-values,text/plain",
                        ".csv")
           ),
+          # TODO: OPTIONAL section
+          # csv upload to customize ratios and|or add rows to userMinMax
+          #       allow download the default table, allow edits
           tags$hr(),  # Horizontal line ------------------------------------
         ),
         tabPanel(
           "Clustering",
           plotOutput("clusterDendrogram"),
+
+          # TODO: get these working
           markdown("**clusterSize**"), textOutput("clusterSize", inline=TRUE),
           markdown("**nClusters**"), textOutput("nClusters", inline=TRUE),
+
+          # TODO: dropdown instead of textInput
           textInput("clusterSelector", "selected cluster", 1),
+
+          # TODO: download button for the cluster info
         ),
         tabPanel(
           "Simulated Annealing",
           plotOutput("annealingPlot"),
-          verbatimTextOutput("annealingSummary")
+          verbatimTextOutput("annealingSummary"),
+
+          # TODO: print the F matrix
+          # & table for group and ratios
+
+          # TODO: download button
         ),
       )
     )
