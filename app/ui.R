@@ -1,37 +1,34 @@
 ui <- fluidPage(
   # App title ----
-  titlePanel("Phytoplankton-From-Pigments GUI v0.0.3"),
+  titlePanel(
+    markdown("
+# Phytoplankton-From-Pigments GUI v0.1.0
+This tool uses the [phytoclass R library](https://cran.r-project.org/web/packages/phytoclass/index.html) to estimate phytoplankton community composition from pigment data.
+
+## How to Cite
+TODO
+
+## Feedback
+Share your thoughts and report bugs by creating a new issue in the [issue tracker](https://github.com/USF-IMARS/chemtax-shiny-gui/issues).
+Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
+  ")
+  ),
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
     # Sidebar panel for inputs ----
     sidebarPanel(
       tabsetPanel(type = "tabs",
-        tabPanel("about",
+        tabPanel("code",
           markdown("
-            This tool uses the [phytoclass R library](https://cran.r-project.org/web/packages/phytoclass/index.html) to estimate phytoplankton community composition from pigment data.
-
-            ## How to Cite
-            TODO
-
-            ## Feedback
-            Share your thoughts and report bugs by creating a new issue in the [issue tracker](https://github.com/USF-IMARS/chemtax-shiny-gui/issues).
-            Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
-          ")
-        ),
-        tabPanel("config",
-          markdown("Configuration text `key=value` lines here. One per line. Use `#` for comments."),
+ The code below is used to generate the \"render\" view.
+ Limited manual editing can be done.
+ The editing widgets will modify this code and change the report.
+          "),
+          # TODO: quarto text here
           textAreaInput("configText", "configuration text"),
         ),
-        tabPanel("status",
-          tags$hr(),  # Horizontal line ------------------------------------
-          markdown("**pigments**"), textOutput("pigmentsFileStatusText"),
-          tags$hr(),  # Horizontal line ------------------------------------
-          markdown("**taxa list**"), textOutput("taxalistFileStatusText"),
-          tags$hr(),  # Horizontal line ------------------------------------
-          markdown("**cluster**"), textOutput("clusterSelectStatusText"),
-          tags$hr(),  # Horizontal line ------------------------------------
-          markdown("**annealing**"), textOutput("annealingStatusText"),
-          tags$hr(),  # Horizontal line ------------------------------------
+        tabPanel("render",
+          # TODO: quarto render output here
         ),
       ),
     ),
