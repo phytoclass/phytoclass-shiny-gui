@@ -73,12 +73,14 @@ server <- function(input, output) {
     print('cluster')
     output$cluster_output = renderText("generating report...")
     quarto::quarto_render(
-      input='cluster.qmd',
+      input='www/cluster.qmd',
       execute_params=list(pigments_df_file = input$pigments_file$datapath)
     )
-    output$cluster_output = renderUI(
-      includeHTML("cluster.html")
-    )
+    output$cluster_output = renderUI({
+      tags$iframe(src="cluster.html", width="100%", height="800px")
+
+      # includeHTML("cluster.html")  # expects fragment, not full document
+    })
   })
 
 
