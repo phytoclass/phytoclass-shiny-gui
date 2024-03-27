@@ -49,25 +49,6 @@ server <- function(input, output) {
     }
   })
 
-  runClustering <- function(pigments_df){
-    req(pigments_df)
-    log_trace("running clustering")
-    clusterSelectStatus("running clustering...")
-    result <- phytoclass::Cluster(
-      pigments_df,
-      14  # min_cluster_size
-    )
-    # result$cluster.list
-    # plot of clusters
-    log_trace("cluster result len: {nrow(result)}")
-    clusterResult(result)
-    log_trace("cluster result len: {nrow(clusterResult())}")
-    clusterSelectStatus("clustering complete")
-  }
-
-  observe({runClustering(pigmentsDF())})
-
-
   # === taxa list DF setup & status ===========================================
   taxalistDF <- reactiveVal(NULL)
   taxalistFileStatus <- reactiveVal("taxalist csv needed")
@@ -87,9 +68,21 @@ server <- function(input, output) {
 
 
   # === cluster selection =====================================================
+
+  observeEvent(input$cluster, {
+    print('cluster')
+    output$cluster_output = renderText("generating report...")
+    quarto::quarto_render(
+      input='cluster.qmd',
+      execute_params=list(pigments_df_file = input$pigments_file$datapath)
+    )
+    output$cluster_output = renderUI(
+      includeHTML("cluster.html")
+    )
+  })
+
+
   selectedCluster <- reactiveVal(1)
-  clusterSelectStatus <- reactiveVal("not yet clustered")
-  output$clusterSelectStatusText <- renderText({clusterSelectStatus()})
   observeEvent(input$clusterSelector, {
     selectedValue <- input$clusterSelector
     # validate
@@ -107,17 +100,6 @@ server <- function(input, output) {
   output$clusterDendrogram <- renderPlot({
     req(clusterResult())
     return(plot(clusterResult()$cluster.plot))
-  })
-
-  output$nClusters <- renderText({
-    req(selectedCluster())
-    req(clusterResult())
-    return(nrow(clusterResult()$cluster.list))
-  })
-  output$clusterSize <- renderText({
-    req(selectedCluster())
-    req(clusterResult())
-    return(nrow(clusterResult()$cluster.list[[selectedCluster()]]))
   })
 
   # === annealing run =========================================================

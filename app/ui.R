@@ -70,17 +70,9 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
         ),
 
         tabPanel(
-          "Clustering",
-          plotOutput("clusterDendrogram"),
-
-          # TODO: get these working
-          markdown("**clusterSize**"), textOutput("clusterSize", inline=TRUE),
-          markdown("**nClusters**"), textOutput("nClusters", inline=TRUE),
-
-          # TODO: dropdown instead of textInput
-          textInput("clusterSelector", "selected cluster", 1),
-
-          # TODO: download button for the cluster info
+          "Cluster",
+          actionButton("cluster", "generate report"),
+          htmlOutput("cluster_output")
         ),
         tabPanel(
           "Simulated Annealing",
