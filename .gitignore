@@ -1,3 +1,9 @@
 .RData
 .RHistory
+.Rhistory
 .Rproj.user
+
+# shiny files
+app/*_files/
+app/rsconnect/
+app/www/*
