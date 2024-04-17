@@ -6,4 +6,9 @@
 # shiny files
 app/*_files/
 app/rsconnect/
-app/www/*
+app/www/*html
+app/www/*jpg
+*_files/
+
+# ubuntu backups
+*~
