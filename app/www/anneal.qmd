@@ -1,0 +1,58 @@
+---
+title: "Cluster"
+format:
+  html:
+    code-fold: true
+    standalone: true
+params:
+  cluster_rds: "clusters.rds"
+  seed: 7683
+  selected_cluster: 1
+  niter: 10
+---
+
+```{R}
+#| code-summary: setup
+
+library("glue")
+```
+
+```{R}
+#| label: load data
+
+clusters <- readRDS(params$cluster_rds)
+```
+
+```{R}
+set.seed(params$seed)
+
+Clust1 <- clusters$cluster.list[[
+  params$selected_cluster
+]]
+# log_trace("Remove cluster column/label")
+Clust1$Clust <- NULL
+
+Results <- phytoclass::simulated_annealing(
+  Clust1,
+  niter = params$niter,  # number of iterations
+  # user_defined_min_max = minMaxTable
+  # TODO: place to upload table to replace
+  #       phytoclass::min_max table
+  verbose = FALSE
+)
+
+print(glue("
+ completed w/ RMSE {Results$RMSE}
+"))
+
+print(Results$Figure)
+
+print("MAE:")
+print(Results$MAE)
+
+print("F matrix:")
+print(Results$`F matrix`)
+
+```
+
+TODO: write annealing result to file?

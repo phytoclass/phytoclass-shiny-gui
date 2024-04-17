@@ -5,11 +5,15 @@ format:
     code-fold: true
     standalone: true
 params:
-  pigments_df_file: "../sample_data/sm.csv"
+  pigments_df_file: "pigments.rds"
 ---
+
 ```{R}
 #|label: helper functions
 
+library("glue")
+
+# TODO: source("R/get_df_from_file") instead
 # Helper functions ----
 get_df_from_file <- function(filepath){
   # function to read the taxalist & pigment csv files.
@@ -33,31 +37,32 @@ get_df_from_file <- function(filepath){
 
 ```{R}
 #| label: load data
-tryCatch({
-  
-  pigment_df <- get_df_from_file(params$pigments_df_file)
-  # TODO: validate
-  
-  # Update the status based on the length of the data frame
-  if (nrow(pigment_df) > 0) {
-    print(paste("Data loaded, length:", nrow(pigment_df)))
-  } else {
-    print("Data loaded, but the data frame is empty")
-  }
-}, error = function(e){print(e)})
+# print(glue("reading from {params$pigments_df_file}"))
+pigment_df <- readRDS(params$pigments_df_file)  #get_df_from_file(params$pigments_df_file)
+# TODO: validate
+
+# Update the status based on the length of the data frame
+print(paste("Data loaded, length:", nrow(pigment_df)))
 
 ```
 
 ```{R}
 #|label: clustering
-tryCatch({
+
 result <- phytoclass::Cluster(
   pigment_df,
   14  # min_cluster_size
 )
+```
+
+```{R}
+fname = "clusters.rds"
+saveRDS(result, file=fname)
+print(glue("cluster result saved to file {fname}"))
+```
+
+```{R}
 # print(result$cluster.list)
 # plot of clusters
 plot(result$cluster.plot)
-}, error = function(e){print(e)})
-
 ```

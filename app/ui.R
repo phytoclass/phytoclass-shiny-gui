@@ -37,7 +37,7 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
     mainPanel(
       # Output: Tabset  ----
       tabsetPanel(type = "tabs",
-        tabPanel("Input Files",
+        tabPanel("1 Inputs",
           markdown("
           # Pigment Sample Matrix
           Select a pigment concentrations file to supply the `Sample Matrix` (aka `S matrix`) of pigment samples.
@@ -70,12 +70,17 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
         ),
 
         tabPanel(
-          "Cluster",
+          "2 Cluster",
           actionButton("cluster", "generate report"),
           htmlOutput("cluster_output")
         ),
         tabPanel(
-          "Simulated Annealing",
+          "3 Anneal",
+          actionButton("anneal", "generate report"),
+          htmlOutput("anneal_output")
+        ),
+        tabPanel(
+          "Simulated Annealing (old)",
           plotOutput("annealingPlot"),
           verbatimTextOutput("annealingSummary"),
 

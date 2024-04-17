@@ -9,6 +9,9 @@ source("R/get_df_from_file.R")
 
 # Define server logic for app ----
 server <- function(input, output) {
+  # TODO: set up tabset disabling for user steps
+  # ref https://chat.openai.com/c/c26c74dc-2038-47fd-87e6-0f8015110215
+
   # === pigments DF setup & status ============================================
   pigmentsDF <- reactiveVal(NULL)
   pigmentsFileStatus <- reactiveVal("pigments csv needed")
@@ -23,6 +26,7 @@ server <- function(input, output) {
     pigment_df <- get_df_from_file(input$pigments_file$datapath)
    # TODO: validate
     pigmentsDF(pigment_df)
+    saveRDS(pigment_df, "www/pigments.rds")
 
     # Update the status based on the length of the data frame
     if (nrow(pigment_df) > 0) {
@@ -56,14 +60,18 @@ server <- function(input, output) {
   observeEvent(input$cluster, {
     print('cluster')
     output$cluster_output = renderText("generating report...")
-    quarto::quarto_render(
-      input='www/cluster.qmd',
-      execute_params=list(pigments_df_file = input$pigments_file$datapath)
-    )
-    output$cluster_output = renderUI({
-      tags$iframe(src="cluster.html", width="100%", height="800px")
+    tryCatch({
+      quarto::quarto_render(
+        input='www/cluster.qmd',
+        execute_params=list(pigments_df_file = "pigments.rds")
+      )
+      output$cluster_output = renderUI({
+        tags$iframe(src="cluster.html", width="100%", height="800px")
 
-      # includeHTML("cluster.html")  # expects fragment, not full document
+        # includeHTML("cluster.html")  # expects fragment, not full document
+      })
+    }, error = function(e) {
+      output$cluster_output = renderPrint(e)
     })
   })
 
@@ -88,7 +96,24 @@ server <- function(input, output) {
     return(plot(clusterResult()$cluster.plot))
   })
 
-  # === annealing run =========================================================
+  # === annealing report =========================================================
+
+  observeEvent(input$anneal, {
+    print('anneal')
+    output$anneal_output = renderText("generating report...")
+    quarto::quarto_render(
+      input='www/anneal.qmd',
+      execute_params=list(
+        cluster_rds="clusters.rds"  # TODO: fill these to match .qmd
+      )
+    )
+    output$anneal_output = renderUI({
+      tags$iframe(src="anneal.html", width="100%", height="800px")
+      # includeHTML("cluster.html")  # expects fragment, not full document
+    })
+  })
+
+  # === (OLD) annealing run =========================================================
   annealingStatus <- reactiveVal("Not Started")
   annealingResult <- reactiveVal()
   output$annealingStatusText <- renderText({annealingStatus()})
