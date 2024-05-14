@@ -1,8 +1,15 @@
 library(later)
+library(glue)
 
 quartoReportUI <- function(id){
   ns <- NS(id)
   return(tagList(
+    fileInput("inputFile", "output from previous step will be used, else upload file here",
+      width = "100%",
+      accept = ".rds",
+      buttonLabel = "input file",
+      placeholder = glue("{id}_input.rds")
+    ),
     actionButton(ns("button"), "generate report"),
     htmlOutput(ns("output"))
   ))
@@ -25,7 +32,10 @@ quartoReportServer <- function(id, exec_params){
             # includeHTML("cluster.html")  # expects fragment, not full document
           })
         }, error = function(e) {
-          output$output = renderPrint(e)
+          output$output <- renderUI({
+            HTML(paste0("<pre>", e, "</pre>"))
+          })
+          # output$output <- renderPrint(e)
           # TODO: print quarto error? how?
         })
       }, 0.1) # Schedule this to run almost immediately after the initial output

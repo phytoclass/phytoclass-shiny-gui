@@ -56,13 +56,11 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
           # `Ratio Matrix` (aka `F matrix`) is the ratio of pigments relative to chlorophyll a.
           tags$hr(),  # Horizontal line ------------------------------------
         ),
-        tabPanel(
-          "2 Cluster",
+        tabPanel("2 Cluster",
           quartoReportUI("cluster")
         ),
         # TODO: save clusters .csv
-        tabPanel(
-          "3 Anneal",
+        tabPanel("3 Anneal",
           # TODO: tabPanel with single-cluster & all clusters
           # TODO: add cluster selector
           quartoReportUI("anneal")

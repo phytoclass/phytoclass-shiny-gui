@@ -5,7 +5,8 @@ format:
     code-fold: true
     standalone: true
 params:
-  cluster_rds: "clusters.rds"
+  inputFile: "clusters.rds"
+  outputFile: "anneal.rds"
   seed: 7683
   selected_cluster: 1
   niter: 10
@@ -20,7 +21,7 @@ library("glue")
 ```{R}
 #| label: load data
 
-clusters <- readRDS(params$cluster_rds)
+clusters <- readRDS(params$inputFile)
 ```
 
 ```{R}

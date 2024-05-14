@@ -5,14 +5,14 @@ format:
     code-fold: true
     standalone: true
 params:
-  pigments_df_file: "pigments.rds"
+  inputFile: "pigments.rds"
+  outputFile: "clusters.rds"
 ---
 
 ```{R}
 #|label: helper functions
 
 library("glue")
-
 # TODO: source("R/get_df_from_file") instead
 # Helper functions ----
 get_df_from_file <- function(filepath){
@@ -38,7 +38,7 @@ get_df_from_file <- function(filepath){
 ```{R}
 #| label: load data
 # print(glue("reading from {params$pigments_df_file}"))
-pigment_df <- readRDS(params$pigments_df_file)  #get_df_from_file(params$pigments_df_file)
+pigment_df <- readRDS(params$inputFile)  #get_df_from_file(params$pigments_df_file)
 # TODO: validate
 
 # Update the status based on the length of the data frame
@@ -56,7 +56,7 @@ result <- phytoclass::Cluster(
 ```
 
 ```{R}
-fname = "clusters.rds"
+fname = params$outputFile
 saveRDS(result, file=fname)
 print(glue("cluster result saved to file {fname}"))
 ```
