@@ -1,3 +1,6 @@
+# load modules
+source("modules/quartoReport.R")
+
 ui <- fluidPage(
   # App title ----
   titlePanel(markdown("
@@ -55,8 +58,8 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
         ),
         tabPanel(
           "2 Cluster",
-          actionButton("cluster", "generate report"),
-          htmlOutput("cluster_output")
+          quartoReportUI("cluster")
+
         ),
         # TODO: save clusters .csv
         tabPanel(

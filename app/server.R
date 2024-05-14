@@ -56,25 +56,10 @@ server <- function(input, output) {
 
 
   # === cluster selection =====================================================
-
-  observeEvent(input$cluster, {
-    print('cluster')
-    output$cluster_output = renderText("generating report...")
-    tryCatch({
-      quarto::quarto_render(
-        input='www/cluster.qmd',
-        execute_params=list(pigments_df_file = "pigments.rds")
-      )
-      output$cluster_output = renderUI({
-        tags$iframe(src="cluster.html", width="100%", height="800px")
-
-        # includeHTML("cluster.html")  # expects fragment, not full document
-      })
-    }, error = function(e) {
-      output$cluster_output = renderPrint(e)
-      # TODO: print quarto error? how?
-    })
-  })
+  quartoReportServer(
+    "cluster",
+    list(pigments_df_file = "pigments.rds")
+  )
 
 
   selectedCluster <- reactiveVal(1)
@@ -113,60 +98,6 @@ server <- function(input, output) {
       tags$iframe(src="anneal.html", width="100%", height="800px")
       # includeHTML("cluster.html")  # expects fragment, not full document
     })
-  })
-
-  # === (OLD) annealing run =========================================================
-  annealingStatus <- reactiveVal("Not Started")
-  annealingResult <- reactiveVal()
-  output$annealingStatusText <- renderText({annealingStatus()})
-  # observeEvent(input$taxalist_file, {
-  #   # pigmentsDFClusters$cluster.list[[1]]
-  #
-  # })
-
-  observe({
-    annealingStatus("awaiting cluster input")
-    req(clusterResult())
-    req(selectedCluster())
-    annealingStatus(glue("extracting cluster #{selectedCluster()}"))
-    Clust1 <- clusterResult()$cluster.list[[
-      as.numeric(selectedCluster())
-    ]]
-    log_trace(glue("cluster # {selectedCluster()}:"))
-    # log_trace(Clust1)
-    log_trace("Remove cluster column/label")
-    Clust1$Clust <- NULL
-    log_trace("selected cluster:")
-    log_trace(nrow(Clust1))
-
-    req(Clust1)
-    annealingStatus("running...")
-    log_trace("annealing...")
-    set.seed("7683")  # TODO: set set in UI
-    # TODO: can we print temp to the UI from the console
-    Results <- phytoclass::simulated_annealing(
-      Clust1,
-      niter = 300  # number of iterations
-      # user_defined_min_max = minMaxTable
-      # TODO: place to upload table to replace
-      #       phytoclass::min_max table
-    )
-
-    annealingStatus(glue("
-     completed w/ RMSE {Results$RMSE}
-   "))
-    annealingResult(Results)
-    log_trace("annealing complete")
-  })
-
-  output$annealingSummary <- renderText({
-    req(annealingResult())
-    return(annealingResult()$`Class abundances`)
-  })
-
-  output$annealingPlot <- renderPlot({
-    req(annealingResult())
-    return(annealingResult()$Figure)
   })
 }
 
