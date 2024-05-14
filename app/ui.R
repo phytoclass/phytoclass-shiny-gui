@@ -66,8 +66,7 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
           "3 Anneal",
           # TODO: tabPanel with single-cluster & all clusters
           # TODO: add cluster selector
-          actionButton("anneal", "generate report"),
-          htmlOutput("anneal_output")
+          quartoReportUI("anneal")
         ),
           # TODO: download button
       )

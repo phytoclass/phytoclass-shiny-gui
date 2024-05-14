@@ -83,22 +83,11 @@ server <- function(input, output) {
   })
 
   # === annealing report =========================================================
+  quartoReportServer(
+    "anneal",
+    list(cluster_rds = "clusters.rds")  # TODO: fill these to match .qmd
+  )
 
-  observeEvent(input$anneal, {
-    print('anneal')
-    output$anneal_output = renderText("generating report...")
-    # TODO: trigger re-render
-    quarto::quarto_render(
-      input='www/anneal.qmd',
-      execute_params=list(
-        cluster_rds="clusters.rds"  # TODO: fill these to match .qmd
-      )
-    )
-    output$anneal_output = renderUI({
-      tags$iframe(src="anneal.html", width="100%", height="800px")
-      # includeHTML("cluster.html")  # expects fragment, not full document
-    })
-  })
 }
 
 
