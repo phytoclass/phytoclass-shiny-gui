@@ -59,7 +59,6 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
         tabPanel(
           "2 Cluster",
           quartoReportUI("cluster")
-
         ),
         # TODO: save clusters .csv
         tabPanel(

@@ -54,40 +54,17 @@ server <- function(input, output) {
     }
   })
 
-
   # === cluster selection =====================================================
   quartoReportServer(
     "cluster",
     list(pigments_df_file = "pigments.rds")
   )
 
-
-  selectedCluster <- reactiveVal(1)
-  observeEvent(input$clusterSelector, {
-    selectedValue <- input$clusterSelector
-    # validate
-    # log_info(glue(
-    #   "selected cluster of size {nrow(clusterResult()$cluster.list[[selectedValue]])}"
-    # ))
-    if(selectedValue < 1){  # TODO: also check upper bound
-      clusterSelectStatus("bad cluster selection value")
-    } else {
-    clusterSelectStatus(glue("selected cluster {selectedCluster()}"))
-      selectedCluster(selectedValue)
-    }
-  })
-
-  output$clusterDendrogram <- renderPlot({
-    req(clusterResult())
-    return(plot(clusterResult()$cluster.plot))
-  })
-
   # === annealing report =========================================================
   quartoReportServer(
     "anneal",
     list(cluster_rds = "clusters.rds")  # TODO: fill these to match .qmd
   )
-
 }
 
 
