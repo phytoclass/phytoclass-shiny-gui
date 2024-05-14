@@ -47,7 +47,7 @@ print(glue("
 
 print(Results$Figure)
 
-print("MAE:")
+print("Mean Absolute Error (MAE):")
 print(Results$MAE)
 
 print("F matrix:")

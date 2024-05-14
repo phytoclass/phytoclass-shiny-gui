@@ -13,14 +13,12 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
 
   ")),
 
-## TODO: RUN BUTTON instead of reactive?
-
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
     # Sidebar panel for inputs ----
 
     sidebarPanel(
-      img(src='vertical_collage.jpg'),
+      img(src='vertical_collage.jpg'),  # TODO: dynamic sizing, smaller?
       tabPanel("status",
         tags$hr(),  # Horizontal line ------------------------------------
         markdown("**pigments**"), textOutput("pigmentsFileStatusText"),
@@ -74,8 +72,13 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
           actionButton("cluster", "generate report"),
           htmlOutput("cluster_output")
         ),
+        # TODO: save clusters .csv
         tabPanel(
           "3 Anneal",
+
+          # TODO: tabPanel with single-cluster & all clusters
+
+          # TODO: add cluster selector
           actionButton("anneal", "generate report"),
           htmlOutput("anneal_output")
         ),
@@ -83,9 +86,6 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
           "Simulated Annealing (old)",
           plotOutput("annealingPlot"),
           verbatimTextOutput("annealingSummary"),
-
-          # TODO: print the F matrix
-          # & table for group and ratios
 
           # TODO: download button
         ),

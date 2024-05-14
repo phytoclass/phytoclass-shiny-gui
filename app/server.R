@@ -72,6 +72,7 @@ server <- function(input, output) {
       })
     }, error = function(e) {
       output$cluster_output = renderPrint(e)
+      # TODO: print quarto error? how?
     })
   })
 
@@ -101,6 +102,7 @@ server <- function(input, output) {
   observeEvent(input$anneal, {
     print('anneal')
     output$anneal_output = renderText("generating report...")
+    # TODO: trigger re-render
     quarto::quarto_render(
       input='www/anneal.qmd',
       execute_params=list(

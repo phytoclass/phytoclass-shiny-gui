@@ -65,4 +65,13 @@ print(glue("cluster result saved to file {fname}"))
 # print(result$cluster.list)
 # plot of clusters
 plot(result$cluster.plot)
+
+# TDOO: interactive plot?
 ```
+
+# TODO: how many clusters decided?
+
+```{R}
+#| code-summary: plotly cluster display
+
+
