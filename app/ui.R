@@ -1,7 +1,7 @@
 ui <- fluidPage(
   # App title ----
   titlePanel(markdown("
-# Phytoplankton-From-Pigments GUI v0.0.4
+# Phytoplankton-From-Pigments GUI v0.0.5
 This tool uses the [phytoclass R library](https://cran.r-project.org/web/packages/phytoclass/index.html) to estimate phytoplankton community composition from pigment data.
 
 ## How to Cite
@@ -18,18 +18,7 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
     # Sidebar panel for inputs ----
 
     sidebarPanel(
-      img(src='vertical_collage.jpg'),  # TODO: dynamic sizing, smaller?
-      tabPanel("status",
-        tags$hr(),  # Horizontal line ------------------------------------
-        markdown("**pigments**"), textOutput("pigmentsFileStatusText"),
-        tags$hr(),  # Horizontal line ------------------------------------
-        markdown("**taxa list**"), textOutput("taxalistFileStatusText"),
-        tags$hr(),  # Horizontal line ------------------------------------
-        markdown("**cluster**"), textOutput("clusterSelectStatusText"),
-        tags$hr(),  # Horizontal line ------------------------------------
-        markdown("**annealing**"), textOutput("annealingStatusText"),
-        tags$hr(),  # Horizontal line ------------------------------------
-      ),
+      img(src='vertical_collage.jpg', width="100%%"),  # TODO: dynamic sizing, smaller?
     ),
     # Main panel for displaying outputs ----
     mainPanel(
@@ -58,15 +47,12 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
                        "text/comma-separated-values,text/plain",
                        ".csv")
           ),
-
           # TODO: OPTIONAL section
           # csv upload to customize ratios and|or add rows to userMinMax
           #       allow download the default table, allow edits
           # `Ratio Matrix` (aka `F matrix`) is the ratio of pigments relative to chlorophyll a.
-
           tags$hr(),  # Horizontal line ------------------------------------
         ),
-
         tabPanel(
           "2 Cluster",
           actionButton("cluster", "generate report"),
@@ -75,20 +61,12 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
         # TODO: save clusters .csv
         tabPanel(
           "3 Anneal",
-
           # TODO: tabPanel with single-cluster & all clusters
-
           # TODO: add cluster selector
           actionButton("anneal", "generate report"),
           htmlOutput("anneal_output")
         ),
-        tabPanel(
-          "Simulated Annealing (old)",
-          plotOutput("annealingPlot"),
-          verbatimTextOutput("annealingSummary"),
-
           # TODO: download button
-        ),
       )
     )
   )
