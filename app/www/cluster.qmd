@@ -69,9 +69,12 @@ plot(result$cluster.plot)
 # TDOO: interactive plot?
 ```
 
-# TODO: how many clusters decided?
+```{R}
+#| code-summary: print number of clusters
+print(length(result$cluster.list[[1]][[1]]))
+```
 
 ```{R}
-#| code-summary: plotly cluster display
-
+#| code-summary: plotly cluster display?
+```
 

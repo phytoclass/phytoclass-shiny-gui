@@ -27,45 +27,56 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
     mainPanel(
       # Output: Tabset  ----
       tabsetPanel(type = "tabs",
-        tabPanel("1 Inputs",
+        tabPanel("1 Upload Pigment Data",
           markdown("
           # Pigment Sample Matrix
           Select a pigment concentrations file to supply the `Sample Matrix` (aka `S matrix`) of pigment samples.
           [See here for details](https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/pigment_matrix.md)
-          "), # TODO: check these links work
+          "),
           fileInput("pigments_file", "Pigments .csv file.",
                     multiple = FALSE,
                     accept = c("text/csv",
                                "text/comma-separated-values,text/plain",
                                ".csv")),
-          tags$hr(),  # Horizontal line ------------------------------------
-          markdown("
+          # TODO: add report?
+          # TODO: toggle pigments on/off
+        ),
+        tabPanel("2 Select Taxa",
+                           markdown("
             # Taxa list
             List of taxa expected in the sample.
             **NOTE: Not Yet Implemented.**
           "),
+          # TODO: OPTIONAL section
+          # csv upload to customize ratios and|or add rows to userMinMax
+          #       allow download the default table, allow edits
+          # `Ratio Matrix` (aka `F matrix`) is the ratio of pigments relative to chlorophyll a.
+          # TODO: select preset dropdown (region)
+          selectInput("taxaPreset", "Taxa Preset", list("all", "antarctic")),
+          # TODO: or custom preset upload
           fileInput("taxalist_file", "List of taxa .csv file.",
             multiple = FALSE,
             accept = c("text/csv",
                        "text/comma-separated-values,text/plain",
                        ".csv")
           ),
-          # TODO: OPTIONAL section
-          # csv upload to customize ratios and|or add rows to userMinMax
-          #       allow download the default table, allow edits
-          # `Ratio Matrix` (aka `F matrix`) is the ratio of pigments relative to chlorophyll a.
-          tags$hr(),  # Horizontal line ------------------------------------
+          # TODO: ability to customize - uncheck groups in the preset
+          #       example removal:
+          #       Sm2 <- Sm[, -4]
         ),
-        tabPanel("2 Cluster",
+        tabPanel("3 Cluster",
           quartoReportUI("cluster")
+          # TODO: save clusters .csv
         ),
-        # TODO: save clusters .csv
-        tabPanel("3 Anneal",
-          # TODO: tabPanel with single-cluster & all clusters
-          # TODO: add cluster selector
+        tabPanel("4 Inspect Cluster",
+          numericInput("selectedCluster", "selected cluster", 1),
+          quartoReportUI("inspectCluster")  # TODO
+        ),
+        tabPanel("5 Anneal",
+          # TODO: seed input & explanation
+          numericInput("selectedCluster", "selected cluster", 1),
           quartoReportUI("anneal")
         ),
-          # TODO: download button
       )
     )
   )

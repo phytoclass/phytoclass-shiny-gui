@@ -12,6 +12,8 @@ quartoReportUI <- function(id){
     ),
     actionButton(ns("button"), "generate report"),
     htmlOutput(ns("output"))
+    # TODO: download output button
+    # TODO: download report button
   ))
 }
 

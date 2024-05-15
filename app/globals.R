@@ -1,6 +1,7 @@
 install.packages("librarian")
 librarian::shelf(
-  "phytoclass"
+  "phytoclass",
+  update_all = T
 )
 
 
