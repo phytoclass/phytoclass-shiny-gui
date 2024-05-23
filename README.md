@@ -2,7 +2,7 @@
 GUI built using R.shiny for CHEMTAX
 
 # TODO:
-* add [file upload](https://shiny.rstudio.com/gallery/file-upload.html)s
+* focus on taxa upload/selection
 
 # ===
 
