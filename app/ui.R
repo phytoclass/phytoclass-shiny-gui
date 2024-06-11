@@ -35,10 +35,12 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
           [See here for details](https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/pigment_matrix.md)
           "),
           fileInput("pigments_file", "Pigments .csv file.",
-                    multiple = FALSE,
-                    accept = c("text/csv",
-                               "text/comma-separated-values,text/plain",
-                               ".csv")),
+            multiple = FALSE,
+            accept = c("text/csv",
+              "text/comma-separated-values,text/plain",
+              ".csv"
+            )
+          ),
           # TODO: add report?
           # TODO: toggle pigments on/off
            markdown("
@@ -57,14 +59,20 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
             multiple = FALSE,
             accept = c("text/csv",
                        "text/comma-separated-values,text/plain",
-                       ".csv")
-          ),
+                       ".csv"
+            )
+          )
           # TODO: ability to customize - uncheck groups in the preset
           #       example removal:
           #       Sm2 <- Sm[, -4]
         ),
         tabPanel("Run Clustering",
-          quartoReportUI("cluster")
+          quartoReportUI("cluster",
+            defaultSetupCode = "
+inputFile = 'pigments.rds'
+outputFile = 'clusters.rds'
+"
+          )
           # TODO: save clusters .csv
         ),
         tabPanel("Inspect a Cluster",
@@ -75,7 +83,10 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
         tabPanel("Run Annealing on a Cluster",
           # TODO: seed input & explanation
           quartoReportUI("anneal",
-            defaultSetupCode = "
+# TODO: fill these to match .qmd
+           defaultSetupCode = "
+inputFile = 'clusters.rds'
+outputFile = 'annealing.rds'
 seed = 0
 selected_cluster = 1
 niter = 10

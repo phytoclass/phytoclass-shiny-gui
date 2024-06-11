@@ -5,23 +5,24 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   ns <- NS(id)
   return(tagList(tabsetPanel(type = "tabs",
     tabPanel("input setup",
-      fileInput("inputFile", "upload file here OR define configuration below.",
+      fileInput(ns("inputFile"), "upload file here OR define configuration below.",
         width = "100%",
         accept = ".rds",
         buttonLabel = "input file",
         placeholder = glue("{id}_input.rds")
       ),
-      textAreaInput("setupInputCode",
+      textAreaInput(ns("setupInputCode"),
         label = "define setup variables here OR use .rds upload above.",
         value = defaultSetupCode,
         width = "100%",
         height = "15em",
         resize = "both"
       ),
-      actionButton("reloadEnvButton", "load variables")
+      actionButton(ns("reloadEnvButton"), "load variables from text input")
     ), tabPanel("generate report",
-      actionButton("generateButton", "generate report"),
-      htmlOutput("output")
+      verbatimTextOutput(ns("execParamsDisplay")),
+      actionButton(ns("generateButton"), "generate report"),
+      htmlOutput(ns("output"))
     )
     # TODO:
     # tabPanel("download results",
@@ -34,15 +35,21 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   )))
 }
 
-quartoReportServer <- function(id, exec_params){
-  # Create an object for the exec_params
-  execParams <- reactiveValues(exec_params = exec_params)
-
+quartoReportServer <- function(id){
   qmd_path <- glue("www/{id}.qmd")
   reportHTMLPath <- glue("{id}.html")
   moduleServer(id, function(input, output, session){
+    # Create an object for the exec_params
+    execParams <- reactiveVal(list())
+
+    # Display the current values of exec_params in monospace
+    output$execParamsDisplay <- renderPrint({
+      execParams()
+    })
+
     # === generate the quarto report =========================================
     observeEvent(input$generateButton, {
+      print(glue("generating report '{id}'..."))
       output$output = renderUI(renderText("generating report..."))
       later::later(function(){
         tryCatch({
@@ -69,6 +76,7 @@ quartoReportServer <- function(id, exec_params){
 
     # === environment reload button =========================================
     observeEvent(input$reloadEnvButton, {
+      print("reloading environment...")
       # Get the code from the text area input
       code <- input$setupInputCode
 
@@ -81,15 +89,25 @@ quartoReportServer <- function(id, exec_params){
       # Evaluate each expression and store variable declarations
       for (expr in expressions) {
         # Parse the expression
-        parsed_expr <- tryCatch(parse(text = expr), error = function(e) NULL)
+        parsed_expr <- tryCatch(parse(text = expr),
+          error = function(e) glue("# invalid code '{expr}'")
+        )
 
         # Check if the parsed expression is an assignment
-        if (!is.null(parsed_expr) && is.call(parsed_expr[[1]]) && parsed_expr[[1]][[1]] == as.symbol("<-")) {
+        if (
+          !is.null(parsed_expr) &&
+          is.call(parsed_expr[[1]]) &&
+          parsed_expr[[1]][[1]] == as.symbol("<-")
+        ) {
           eval(parsed_expr, envir = .GlobalEnv)
           var_name <- as.character(parsed_expr[[1]][[2]])
           var_value <- get(var_name, envir = .GlobalEnv)
-          execParams(execParams()[[var_name]] <- var_value)
-        } # TODO: else print error
+          print(glue("execParam set {var_name}<-{var_value}"))
+          tempList <- execParams()
+          tempList[[var_name]] <- var_value
+          execParams(tempList)
+        } else {
+          print(glue("error in param expression: '{expr}'"))        }
       }
     })
 

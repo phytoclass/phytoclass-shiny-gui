@@ -55,23 +55,10 @@ server <- function(input, output) {
   })
 
   # === cluster selection =====================================================
-  quartoReportServer(
-    "cluster",
-    list(
-      inputFile = "pigments.rds",
-      outputFile = "clusters.rds"
-    )
-  )
+  quartoReportServer("cluster")
 
   # === annealing report =========================================================
-  quartoReportServer(
-    "anneal",
-    list(
-      inputFile = "clusters.rds",
-      outputFile = "annealing.rds"
-      # TODO: fill these to match .qmd
-    )
-  )
+  quartoReportServer("anneal")
 }
 
 
