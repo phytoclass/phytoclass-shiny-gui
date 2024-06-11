@@ -21,13 +21,14 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
     # Sidebar panel for inputs ----
 
     sidebarPanel(
-      img(src='vertical_collage.jpg', width="100%%"),  # TODO: dynamic sizing, smaller?
+      img(src='vertical_collage.jpg', width="100%%"),
+      width = 2
     ),
     # Main panel for displaying outputs ----
     mainPanel(
       # Output: Tabset  ----
       tabsetPanel(type = "tabs",
-        tabPanel("1 Upload Pigment Data",
+        tabPanel("Upload Data Files",
           markdown("
           # Pigment Sample Matrix
           Select a pigment concentrations file to supply the `Sample Matrix` (aka `S matrix`) of pigment samples.
@@ -40,9 +41,7 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
                                ".csv")),
           # TODO: add report?
           # TODO: toggle pigments on/off
-        ),
-        tabPanel("2 Select Taxa",
-                           markdown("
+           markdown("
             # Taxa list
             List of taxa expected in the sample.
             **NOTE: Not Yet Implemented.**
@@ -64,20 +63,27 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
           #       example removal:
           #       Sm2 <- Sm[, -4]
         ),
-        tabPanel("3 Cluster",
+        tabPanel("Run Clustering",
           quartoReportUI("cluster")
           # TODO: save clusters .csv
         ),
-        tabPanel("4 Inspect Cluster",
-          numericInput("selectedCluster", "selected cluster", 1),
-          quartoReportUI("inspectCluster")  # TODO
+        tabPanel("Inspect a Cluster",
+          quartoReportUI("inspectCluster",
+            defaultSetupCode = "selectedCluster <- 1"
+          )  # TODO
         ),
-        tabPanel("5 Anneal",
+        tabPanel("Run Annealing on a Cluster",
           # TODO: seed input & explanation
-          numericInput("selectedCluster", "selected cluster", 1),
-          quartoReportUI("anneal")
+          quartoReportUI("anneal",
+            defaultSetupCode = "
+seed = 0
+selected_cluster = 1
+niter = 10
+"
+         )
         ),
-      )
+      ),
+    width = 10
     )
   )
 )
