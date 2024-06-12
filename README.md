@@ -70,3 +70,43 @@ clusterRDS --> anneal --> annealRDS
   * (NYI) .rds of the final environment
   * (NYI) .qmd of the report (including variable setup at beggining)
   * (NYI) .pdf of the report
+
+## reports info flow
+Theoretical info flow:
+
+```mermaid
+graph TD
+
+fileUpload{{File Upload}}
+
+subgraph user files
+  pigmentsUserFile[["pigments.csv"]]
+  taxaUserFile[["taxa.csv"]]
+end
+
+subgraph R environment
+  initRDS["inital env RDS"]
+  clusterRDSPath["cluster RDS path"]
+end
+
+subgraph server files
+  pigmentsFile["pigments_{hash}.csv"]
+  taxaFile["taxa_{hash}.csv"]
+  clusterRDS[["cluster.rds"]]
+  annealRDS[["anneal.rds"]]
+end
+
+pigmentsUserFile --> fileUpload 
+    fileUpload --> pigmentsFile
+    fileUpload --> initRDS
+taxaUserFile --> fileUpload 
+    fileUpload --> taxaFile
+
+
+pigmentsFile --> cluster{{cluster}} --> clusterRDS
+
+anneal{{anneal}}
+
+clusterRDSPath --> anneal
+clusterRDS --> anneal --> annealRDS
+```
