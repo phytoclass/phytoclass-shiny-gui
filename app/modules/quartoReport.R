@@ -12,7 +12,7 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
         placeholder = glue("{id}_input.rds")
       ),
       textAreaInput(ns("setupInputCode"),
-        label = "define setup variables here OR use .rds upload above.",
+        label = "define setup variables here OR use .rds upload above OR leave defaults.",  # TODO: add link to help docs for paramters
         value = defaultSetupCode,
         width = "100%",
         height = "15em",
