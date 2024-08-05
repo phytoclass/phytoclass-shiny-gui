@@ -77,41 +77,53 @@ clusterRDS --> anneal --> annealRDS
   * (NYI) .pdf of the report
 
 ## reports info flow
-Theoretical info flow:
+Generalized info flow for quartoReport module:
 
 ```mermaid
 graph TD
 
-fileUpload{{File Upload}}
+contextBuilder{{Context Builder}}
+contextLoader{{Context Loader}}
+quartoRender{{quarto Render}}
 
 subgraph user files
-  pigmentsUserFile[["pigments.csv"]]
-  taxaUserFile[["taxa.csv"]]
+  userContextFile[["contextFile.rds"]]
+  userDataFile[["dataFile.csv"]]
 end
 
-subgraph R environment
-  initRDS["inital env RDS"]
-  clusterRDSPath["cluster RDS path"]
+subgraph context settings GUI
+  settingsText[["settings textbox"]]
+  contextUploader[["Context Uploader"]]
+  fileUploader[["Data File Uploader"]]
+end
+
+userDataFile --> fileUploader --> contextBuilder
+userContextFile --> contextUploader --> contextBuilder
+settingsText --> contextBuilder
+
+subgraph R rendering environment
+  quartoParams["quarto params"]
 end
 
 subgraph server files
-  pigmentsFile["pigments_{hash}.csv"]
-  taxaFile["taxa_{hash}.csv"]
-  clusterRDS[["cluster.rds"]]
-  annealRDS[["anneal.rds"]]
+  preRenderContext["preRenderContext_{hash}.rds"]
+  postRenderContext[["postRenderContext_{hash}.rds"]]
+  report[["report.md"]]
 end
 
-pigmentsUserFile --> fileUpload 
-    fileUpload --> pigmentsFile
-    fileUpload --> initRDS
-taxaUserFile --> fileUpload 
-    fileUpload --> taxaFile
+contextBuilder --> preRenderContext
 
+preRenderContext --> contextLoader --> quartoParams
 
-pigmentsFile --> cluster{{cluster}} --> clusterRDS
+quartoParams --> 
+  quartoRender --> postRenderContext
+  quartoRender --> report
 
-anneal{{anneal}}
+report --> downloadReport{{"Download Report"}} 
+  downloadReport --> reportmd[["report.md"]]
+  downloadReport --> reportpdf[["report.pdf"]]
 
-clusterRDSPath --> anneal
-clusterRDS --> anneal --> annealRDS
+downloadContext{{"Download Context"}}
+postRenderContext --> downloadContext
+preRenderContext --> downloadContext
 ```
