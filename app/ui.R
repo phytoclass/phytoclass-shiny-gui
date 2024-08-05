@@ -3,18 +3,20 @@ source("modules/quartoReport.R")
 
 ui <- fluidPage(
   # App title ----
-  titlePanel(markdown("
-# Phytoplankton-From-Pigments GUI v0.0.5
-This tool uses the [phytoclass R library](https://cran.r-project.org/web/packages/phytoclass/index.html) to estimate phytoplankton community composition from pigment data.
-
-## How to Cite
-TODO
-
-## Feedback
-Share your thoughts and report bugs by creating a new issue in the [issue tracker](https://github.com/USF-IMARS/chemtax-shiny-gui/issues).
-Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
-
-  ")),
+  titlePanel(markdown(paste0(
+    "# Phytoplankton-From-Pigments GUI v0.0.5 \n",
+    "This tool uses the [phytoclass R library](",
+    "https://cran.r-project.org/web/packages/phytoclass/index.html",
+    ") to estimate phytoplankton community composition from pigment data. \n",
+    "\n",
+    "## How to Cite \n",
+    "TODO \n",
+    "\n",
+    "## Feedback \n",
+    "Share your thoughts and report bugs by creating a new issue in the ",
+    "[issue tracker](https://github.com/USF-IMARS/chemtax-shiny-gui/issues). \n",
+    "Questions about phytoclass can also be directed to `phytoclass@outlook.com`."
+  ))),
 
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -68,10 +70,11 @@ Questions about phytoclass can also be directed to `phytoclass@outlook.com`.
         ),
         tabPanel("Run Clustering",
           quartoReportUI("cluster",
-            defaultSetupCode = "
-inputFile = 'pigments.rds'
-outputFile = 'clusters.rds'
-"
+            defaultSetupCode = paste(
+              "inputFile = 'pigments.rds'",
+              "outputFile = 'clusters.rds'",
+              sep="/n"
+            )
           )
           # TODO: save clusters .csv
         ),
@@ -83,15 +86,16 @@ outputFile = 'clusters.rds'
         tabPanel("Run Annealing on a Cluster",
           # TODO: seed input & explanation
           quartoReportUI("anneal",
-# TODO: fill these to match .qmd
-           defaultSetupCode = "
-inputFile = 'clusters.rds'
-outputFile = 'annealing.rds'
-seed = 0
-selected_cluster = 1
-niter = 10
-"
-         )
+            # TODO: fill these to match .qmd
+            defaultSetupCode = paste(
+              "inputFile = 'clusters.rds'",
+              "outputFile = 'annealing.rds'",
+              "seed = 0",
+              "selected_cluster = 1",
+              "niter = 10",
+              sep="\n"
+            )
+          )
         ),
       ),
     width = 10
