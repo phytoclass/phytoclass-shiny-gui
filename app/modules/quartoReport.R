@@ -51,11 +51,12 @@ quartoReportServer <- function(id){
     observeEvent(input$generateButton, {
       print(glue("generating report '{id}'..."))
       output$output = renderUI(renderText("generating report..."))
+      exec_params = execParams()  # do this now, use it later
       later::later(function(){
         tryCatch({
           quarto::quarto_render(
             input = qmd_path,
-            execute_params = execParams
+            execute_params = exec_params
           )
           output$output <- renderUI({
             tags$iframe(src=reportHTMLPath, width="100%", height="800px")
@@ -107,7 +108,8 @@ quartoReportServer <- function(id){
           tempList[[var_name]] <- var_value
           execParams(tempList)
         } else {
-          print(glue("error in param expression: '{expr}'"))        }
+          print(glue("error in param expression: '{expr}'"))
+        }
       }
     })
 
@@ -116,3 +118,4 @@ quartoReportServer <- function(id){
 
   })
 }
+
