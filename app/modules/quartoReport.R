@@ -113,9 +113,8 @@ quartoReportServer <- function(id){
       }
     })
 
-        # TODO: download output button controller
+    # TODO: download output button controller
     # TODO: download report button controller
-
   })
 }
 
