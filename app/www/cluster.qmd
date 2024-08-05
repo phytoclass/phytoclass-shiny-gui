@@ -1,5 +1,5 @@
 ---
-title: "Quarto Basics"
+title: "Cluster"
 format:
   html:
     code-fold: true
@@ -13,37 +13,15 @@ params:
 #|label: helper functions
 
 library("glue")
-# TODO: source("R/get_df_from_file") instead
-# Helper functions ----
-get_df_from_file <- function(filepath){
-  # function to read the taxalist & pigment csv files.
-  tryCatch({
-    # when reading semicolon separated files,
-    # having a comma separator causes `read.csv` to error
-      df <- read.csv(filepath,
-                     header = TRUE,
-                     sep = ',',
-                     quote = '"')
-    },
-    error = function(e) {
-      # return a safeError if a parsing error occurs
-      print(e)
-    }
-  )
-  return(df)
-}
-
 ```
 
 ```{R}
 #| label: load data
-# print(glue("reading from {params$pigments_df_file}"))
-pigment_df <- readRDS(params$inputFile)  #get_df_from_file(params$pigments_df_file)
+pigment_df <- readRDS(params$inputFile)
 # TODO: validate
 
 # Update the status based on the length of the data frame
 print(paste("Data loaded, length:", nrow(pigment_df)))
-
 ```
 
 ```{R}
