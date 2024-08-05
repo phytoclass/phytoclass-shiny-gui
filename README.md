@@ -4,11 +4,16 @@ GUI built using R.shiny for CHEMTAX
 # TODO:
 * focus on taxa upload/selection
 
-# ===
+# Setup
+## ubuntu
+```bash
+sudo apt install libfribidi-dev libfontconfig1-dev libfontconfig1-dev
+```
 
+## all
 ```R
-if (!require('shiny')) install.packages("shiny")
-shiny::runApp("app")
+if (!require('devtools')) install.packages("devtools")
+devtools::install_local()
 ```
 
 
