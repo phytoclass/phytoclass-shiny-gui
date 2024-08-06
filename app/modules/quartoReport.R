@@ -67,11 +67,6 @@ quartoReportServer <- function(id){
     # Create an object for the exec_params
     execParams <- reactiveVal(list())
 
-    # Display the current values of exec_params in monospace
-    output$execParamsDisplay <- renderPrint({
-      execParams()
-    })
-
     # === generate the quarto report =========================================
     observeEvent(input$generateButton, {
       print(glue("generating report '{id}'..."))
@@ -125,6 +120,10 @@ quartoReportServer <- function(id){
           print(glue("error in param expression: '{expr}'"))
         }
       }
+      # Display the current values of exec_params in monospace
+      output$execParamsDisplay <- renderPrint({
+        execParams()
+      })
     })
 
     # TODO: download output button controller

@@ -71,9 +71,9 @@ ui <- fluidPage(
         tabPanel("Run Clustering",
           quartoReportUI("cluster",
             defaultSetupCode = paste(
-              "inputFile = 'pigments.rds'",
-              "outputFile = 'clusters.rds'",
-              sep="/n"
+              "inputFile <- 'pigments.rds'",
+              "outputFile <- 'clusters.rds'",
+              sep="\n"
             )
           )
           # TODO: save clusters .csv
@@ -88,11 +88,11 @@ ui <- fluidPage(
           quartoReportUI("anneal",
             # TODO: fill these to match .qmd
             defaultSetupCode = paste(
-              "inputFile = 'clusters.rds'",
-              "outputFile = 'annealing.rds'",
-              "seed = 0",
-              "selected_cluster = 1",
-              "niter = 10",
+              "inputFile <- 'clusters.rds'",
+              "outputFile <- 'annealing.rds'",
+              "seed <- 0",
+              "selected_cluster <- 1",
+              "niter <- 10",
               sep="\n"
             )
           )
