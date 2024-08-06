@@ -38,14 +38,16 @@ buildContext <- function(input, output, execParams){
       print(glue("error in param expression: '{expr}'"))
     }
   }
+  contextParams <- execParams()
   # Display the current values of exec_params in monospace
   output$execParamsDisplay <- renderPrint({
-    execParams()
+    contextParams
   })
 
-  # TODO: save context to RDS file
-  contextRDS <- "context.rds"
-  return(contextRDS)
+  contextRDSPath <- "context.rds"  # TODO: generate better filename (with hash?)
+
+  saveRDS(contextParams, file = contextRDSPath)
+  return(contextRDSPath)
 }
 
 actualRenderReport <- function(
@@ -126,11 +128,13 @@ quartoReportServer <- function(id){
   moduleServer(id, function(input, output, session){
     # Create an object for the exec_params
     execParams <- reactiveVal(list())
+    # TODO: replace execParams with contextRDSPath
+    contextRDSPath <- reactiveVal(NULL)
 
     # === generate the quarto report =========================================
     observeEvent(input$generateButton, {
       renderReport(
-        "context.rds",    # TODO: use real context.rds path
+        contextRDSPath(),    # TODO: use real context.rds path
         output,
         qmd_path, execParams, reportHTMLPath, id
       )
@@ -141,7 +145,7 @@ quartoReportServer <- function(id){
 
     # === environment reload button =========================================
     observeEvent(input$reloadEnvButton, {
-      buildContext(input, output, execParams)
+      contextRDSPath(buildContext(input, output, execParams))
     })
 
     # TODO: download output button controller
