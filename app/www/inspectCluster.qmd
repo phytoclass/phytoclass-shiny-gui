@@ -1,0 +1,26 @@
+---
+title: "Cluster Inspector"
+format:
+  html:
+    code-fold: true
+    standalone: true
+params:
+  inputFile: "clusters.rds"
+---
+
+```{R}
+#|label: helper functions
+
+library("glue")
+```
+
+```{R}
+#| label: load data
+cluster_df <- readRDS(params$inputFile)  
+
+```
+
+```{R}
+#| code-summary: plotly cluster display?
+```
+

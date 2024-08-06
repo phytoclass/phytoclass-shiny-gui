@@ -54,10 +54,13 @@ server <- function(input, output) {
     }
   })
 
-  # === cluster selection =====================================================
+  # cluster selection
   quartoReportServer("cluster")
 
-  # === annealing report =========================================================
+  # cluster inspector
+  quartoReportServer("inspectCluster")
+
+  # annealing report
   quartoReportServer("anneal")
 }
 
