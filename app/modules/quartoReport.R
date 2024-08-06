@@ -1,6 +1,31 @@
 library(later)
 library(glue)
 
+buildContext <- function(){
+  # create context .rds from inputs
+  return(contextRDS)
+}
+
+renderReport <- function(contextRDS, output, qmd_path, exec_params, reportHTMLPath){
+  # render quarto report using given context
+  tryCatch({
+    quarto::quarto_render(
+      input = qmd_path,
+      execute_params = exec_params
+    )
+    output$output <- renderUI({
+      tags$iframe(src=reportHTMLPath, width="100%", height="800px")
+      # includeHTML("cluster.html")  # expects fragment, not full document
+    })
+  }, error = function(e) {
+    output$output <- renderUI({
+      HTML(paste0("<pre>", e, "</pre>"))
+    })
+    # output$output <- renderPrint(e)
+    # TODO: print quarto error? how?
+  })
+}
+
 quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   ns <- NS(id)
   return(tagList(tabsetPanel(type = "tabs",
@@ -53,22 +78,11 @@ quartoReportServer <- function(id){
       output$output = renderUI(renderText("generating report..."))
       exec_params = execParams()  # do this now, use it later
       later::later(function(){
-        tryCatch({
-          quarto::quarto_render(
-            input = qmd_path,
-            execute_params = exec_params
-          )
-          output$output <- renderUI({
-            tags$iframe(src=reportHTMLPath, width="100%", height="800px")
-            # includeHTML("cluster.html")  # expects fragment, not full document
-          })
-        }, error = function(e) {
-          output$output <- renderUI({
-            HTML(paste0("<pre>", e, "</pre>"))
-          })
-          # output$output <- renderPrint(e)
-          # TODO: print quarto error? how?
-        })
+        renderReport(
+          "context.rds",    # TODO: use real context.rds path
+          output,
+          qmd_path, exec_params, reportHTMLPath
+        )
       }, 0.1) # Schedule this to run immediately after the initial output
     })
 
