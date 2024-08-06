@@ -69,7 +69,10 @@ actualRenderReport <- function(
 
     # If the exit status is non-zero, treat it as an error
     if (!is.null(exit_status) && exit_status != 0) {
-      stop(paste("Command failed with status", exit_status, ":", paste(output_message, collapse = "\n")))
+      stop(paste(
+        "Command failed with status", exit_status, ":",
+        paste(output_message, collapse = "\n")
+      ))
     }
 
     # If the command is successful, render the iframe with the report

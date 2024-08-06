@@ -31,11 +31,13 @@ ui <- fluidPage(
       # Output: Tabset  ----
       tabsetPanel(type = "tabs",
         tabPanel("Upload Data Files",
-          markdown("
-          # Pigment Sample Matrix
-          Select a pigment concentrations file to supply the `Sample Matrix` (aka `S matrix`) of pigment samples.
-          [See here for details](https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/pigment_matrix.md)
-          "),
+          markdown(paste0(
+            "# Pigment Sample Matrix \n",
+            "Select a pigment concentrations file to supply the ",
+            "`Sample Matrix` (aka `S matrix`) of pigment samples. \n",
+            "[See here for details]",
+            "(https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/pigment_matrix.md)"
+          )),
           fileInput("pigments_file", "Pigments .csv file.",
             multiple = FALSE,
             accept = c("text/csv",
@@ -53,7 +55,8 @@ ui <- fluidPage(
           # TODO: OPTIONAL section
           # csv upload to customize ratios and|or add rows to userMinMax
           #       allow download the default table, allow edits
-          # `Ratio Matrix` (aka `F matrix`) is the ratio of pigments relative to chlorophyll a.
+          # `Ratio Matrix` (aka `F matrix`) is the ratio of pigments
+          #       relative to chlorophyll a.
           # TODO: select preset dropdown (region)
           selectInput("taxaPreset", "Taxa Preset", list("all", "antarctic")),
           # TODO: or custom preset upload
