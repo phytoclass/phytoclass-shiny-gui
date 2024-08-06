@@ -4,6 +4,6 @@ source("ui.R")
 source("server.R")
 
 # modules
-# TODO: load modules here
+source("modules/quartoReport/quartoReport.R")
 
 shinyApp(ui = ui, server = server)

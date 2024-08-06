@@ -1,6 +1,3 @@
-# load modules
-source("modules/quartoReport.R")
-
 ui <- fluidPage(
   # App title ----
   titlePanel(markdown(paste0(
