@@ -14,7 +14,6 @@ server <- function(input, output) {
 
   # === pigments DF setup & status ============================================
   pigmentsFileStatus <- reactiveVal("pigments csv needed")
-  clusterResult <- reactiveVal()
 
   output$pigmentsFileStatusText <- renderText({pigmentsFileStatus()})
 
