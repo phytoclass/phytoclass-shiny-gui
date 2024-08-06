@@ -48,8 +48,11 @@ buildContext <- function(input, output, execParams){
   return(contextRDS)
 }
 
-renderReport <- function(contextRDS, output, qmd_path, exec_params, reportHTMLPath){
-  # render quarto report using given context
+actualRenderReport <- function(
+    contextRDS, output, qmd_path, exec_params, reportHTMLPath
+){
+  # render quarto report immediately using given context
+  # should be used in a callback (later) to avoid UI lockup
   tryCatch({
     quarto::quarto_render(
       input = qmd_path,
@@ -68,6 +71,21 @@ renderReport <- function(contextRDS, output, qmd_path, exec_params, reportHTMLPa
   })
 }
 
+renderReport <- function(
+    contextRDS, output, qmd_path, execParams, reportHTMLPath, id
+){
+  # renderReport schedules the render for later so that the "generating report..." text shows immediately
+  print(glue("generating report '{id}'..."))
+  output$output = renderUI(renderText("generating report..."))
+  exec_params = execParams()  # do this now, use it later
+  later::later(function(){
+    actualRenderReport(
+      contextRDS,
+      output,
+      qmd_path, exec_params, reportHTMLPath
+    )
+  }, 0.1) # Schedule this to run immediately after the initial output
+}
 quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   ns <- NS(id)
   return(tagList(tabsetPanel(type = "tabs",
@@ -111,16 +129,11 @@ quartoReportServer <- function(id){
 
     # === generate the quarto report =========================================
     observeEvent(input$generateButton, {
-      print(glue("generating report '{id}'..."))
-      output$output = renderUI(renderText("generating report..."))
-      exec_params = execParams()  # do this now, use it later
-      later::later(function(){
-        renderReport(
-          "context.rds",    # TODO: use real context.rds path
-          output,
-          qmd_path, exec_params, reportHTMLPath
-        )
-      }, 0.1) # Schedule this to run immediately after the initial output
+      renderReport(
+        "context.rds",    # TODO: use real context.rds path
+        output,
+        qmd_path, execParams, reportHTMLPath, id
+      )
     })
 
     # === environment upload ================================================
