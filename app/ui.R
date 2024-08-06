@@ -81,7 +81,7 @@ ui <- fluidPage(
         tabPanel("Inspect a Cluster",
           quartoReportUI("inspectCluster",
             defaultSetupCode = "selectedCluster <- 1"
-          )  # TODO
+          )
         ),
         tabPanel("Run Annealing on a Cluster",
           # TODO: seed input & explanation
