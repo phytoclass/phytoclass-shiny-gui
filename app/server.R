@@ -13,7 +13,6 @@ server <- function(input, output) {
   # ref https://chat.openai.com/c/c26c74dc-2038-47fd-87e6-0f8015110215
 
   # === pigments DF setup & status ============================================
-  pigmentsDF <- reactiveVal(NULL)
   pigmentsFileStatus <- reactiveVal("pigments csv needed")
   clusterResult <- reactiveVal()
 
@@ -24,8 +23,9 @@ server <- function(input, output) {
     # Load your data into the 'data' reactive value
     # For example, reading a CSV file:
     pigment_df <- get_df_from_file(input$pigments_file$datapath)
-   # TODO: validate
-    pigmentsDF(pigment_df)
+    # TODO: validate
+
+    # TODO: generate more clever filepath
     saveRDS(pigment_df, "www/pigments.rds")
 
     # Update the status based on the length of the data frame
