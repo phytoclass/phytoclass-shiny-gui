@@ -82,9 +82,9 @@ Generalized info flow for quartoReport module:
 ```mermaid
 graph TD
 
-contextBuilder{{Context Builder}}
-contextLoader{{Context Loader}}
-quartoRender{{quarto Render}}
+contextBuilder{{buildContext}}
+contextLoader{{loadContext}}
+quartoRender{{renderReport}}
 
 subgraph user files
   userContextFile[["contextFile.rds"]]
