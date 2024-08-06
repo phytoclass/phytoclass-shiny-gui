@@ -56,20 +56,37 @@ actualRenderReport <- function(
   # render quarto report immediately using given context
   # should be used in a callback (later) to avoid UI lockup
   tryCatch({
-    quarto::quarto_render(
-      input = qmd_path,
-      execute_params = exec_params
+    # Run the command and capture output and error messages
+    output_message <- system2(
+      command = "quarto",
+      args = c("render", qmd_path, "--execute-params", exec_params),
+      stdout = TRUE, stderr = TRUE,
+      wait = TRUE
     )
+
+    # Check the exit status of the command
+    exit_status <- attr(output_message, "status")
+
+    # If the exit status is non-zero, treat it as an error
+    if (!is.null(exit_status) && exit_status != 0) {
+      stop(paste("Command failed with status", exit_status, ":", paste(output_message, collapse = "\n")))
+    }
+
+    # If the command is successful, render the iframe with the report
     output$output <- renderUI({
-      tags$iframe(src=reportHTMLPath, width="100%", height="800px")
-      # includeHTML("cluster.html")  # expects fragment, not full document
+      tags$iframe(src = reportHTMLPath, width = "100%", height = "800px")
     })
   }, error = function(e) {
+    # If there is an error, render the captured output as HTML
     output$output <- renderUI({
-      HTML(paste0("<pre>", e, "</pre>"))
+      HTML(paste0(
+        "ERROR while rendering! Please check your inputs.\n",
+        'For help please ',
+        '<a href="https://github.com/USF-IMARS/chemtax-shiny-gui/issues/new">',
+        'open an issue on the project github</a> and include the text below.',
+        "<pre>", paste(output_message, collapse = "\n"), "</pre>"
+      ))
     })
-    # output$output <- renderPrint(e)
-    # TODO: print quarto error? how?
   })
 }
 
