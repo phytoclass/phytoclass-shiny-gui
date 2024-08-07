@@ -12,11 +12,7 @@ server <- function(input, output) {
   # TODO: set up tabset disabling for user steps
   # ref https://chat.openai.com/c/c26c74dc-2038-47fd-87e6-0f8015110215
 
-  # === pigments DF setup & status ============================================
-  pigmentsFileStatus <- reactiveVal("pigments csv needed")
-
-  output$pigmentsFileStatusText <- renderText({pigmentsFileStatus()})
-
+  # === pigments DF setup ============================================
   observeEvent(input$pigments_file, {
     log_trace("pigment file changed")
     # Load your data into the 'data' reactive value
@@ -26,31 +22,15 @@ server <- function(input, output) {
 
     # TODO: generate more clever filepath
     saveRDS(pigment_df, "www/pigments.rds")
-
-    # Update the status based on the length of the data frame
-    if (nrow(pigment_df) > 0) {
-      pigmentsFileStatus(paste("Data loaded, length:", nrow(pigment_df)))
-      log_trace("pigment file load success")
-    } else {
-      pigmentsFileStatus("Data loaded, but the data frame is empty")
-    }
   })
 
-  # === taxa list DF setup & status ===========================================
-  taxalistDF <- reactiveVal(NULL)
-  taxalistFileStatus <- reactiveVal("taxalist csv needed")
+  # === taxa list DF setup ===========================================
   output$taxalistFileStatusText <- renderText({taxalistFileStatus()})
   observeEvent(input$taxalist_file, {
     taxalist_df <- get_df_from_file(input$taxalist_file$datapath)
    # TODO: validate
     taxalistDF(taxalist_df)
 
-    # Update the status based on the length of the data frame
-    if (nrow(taxalist_df) > 0) {
-      taxalistFileStatus(paste("Data loaded, length:", nrow(taxalist_df)))
-    } else {
-      taxalistFileStatus("Data loaded, but the data frame is empty")
-    }
   })
 
   # === quarto reports ========================================================
