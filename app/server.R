@@ -28,8 +28,10 @@ server <- function(input, output) {
   output$taxalistFileStatusText <- renderText({taxalistFileStatus()})
   observeEvent(input$taxalist_file, {
     taxalist_df <- get_df_from_file(input$taxalist_file$datapath)
-   # TODO: validate
-    taxalistDF(taxalist_df)
+    # TODO: validate
+
+    # TODO: generate more clever filepath
+    saveRDS(pigment_df, "www/taxa.rds")
 
   })
 

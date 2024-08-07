@@ -6,6 +6,7 @@ format:
     standalone: true
 params:
   inputFile: "clusters.rds"
+  taxaFile: "taxa.rds"
   outputFile: "anneal.rds"
   seed: 7683
   selected_cluster: 1
@@ -22,19 +23,21 @@ library("glue")
 #| label: load data
 
 clusters <- readRDS(params$inputFile)
+taxa <- readRDS(params$taxaFile)
 ```
 
-```{R}
+```{R, run annealing}
 set.seed(params$seed)
 
-Clust1 <- clusters$cluster.list[[
+selectedCluster <- clusters$cluster.list[[
   params$selected_cluster
 ]]
 # log_trace("Remove cluster column/label")
-Clust1$Clust <- NULL
+selectedCluster$Clust <- NULL
 
 Results <- phytoclass::simulated_annealing(
-  Clust1,
+  S = selectedCluster,
+  F = taxa,
   niter = params$niter,  # number of iterations
   # user_defined_min_max = minMaxTable
   # TODO: place to upload table to replace

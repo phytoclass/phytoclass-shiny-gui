@@ -46,11 +46,11 @@ ui <- fluidPage(
             # TODO: toggle pigments on/off
           ),
           tabPanel("Taxa List",
-            markdown("
-              # Taxa list
-              List of taxa expected in the sample.
-              **NOTE: Not Yet Implemented.**
-            "),
+            markdown(paste(
+              "# Taxa list",
+              "List of taxa expected in the sample.",
+              sep = "\n"
+            ),
             # TODO: OPTIONAL section
             # csv upload to customize ratios and|or add rows to userMinMax
             #       allow download the default table, allow edits
@@ -93,6 +93,7 @@ ui <- fluidPage(
           # TODO: fill these to match .qmd
           defaultSetupCode = paste(
             "inputFile <- 'clusters.rds'",
+            "taxaFile <- 'taxa.rds'",
             "outputFile <- 'annealing.rds'",
             "seed <- 0",
             "selected_cluster <- 1",
