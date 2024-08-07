@@ -53,6 +53,7 @@ server <- function(input, output) {
     }
   })
 
+  # === quarto reports ========================================================
   # cluster selection
   quartoReportServer("cluster")
 
