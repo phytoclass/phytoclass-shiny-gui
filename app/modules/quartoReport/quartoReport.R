@@ -2,7 +2,7 @@ library(later)
 library(glue)
 library(here)
 
-source(here("app/modules/quartoReport/buildContext.R"))
+source("modules/quartoReport/buildContext.R")
 
 actualRenderReport <- function(
     contextRDS, output, qmd_path, exec_params, reportHTMLPath

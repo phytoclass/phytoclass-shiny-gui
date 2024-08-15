@@ -11,8 +11,8 @@ source("modules/quartoReport/quartoReport.R")
 # Define server logic for app ----
 server <- function(input, output) {
   # set up default files on app open
-  saveRDS(get_df_from_file("../sample_data/sm.csv"), "www/pigments.rds")
-  saveRDS(get_df_from_file("../sample_data/taxa.csv"), "www/taxa.rds")
+  saveRDS(get_df_from_file("sample_data/sm.csv"), "www/pigments.rds")
+  saveRDS(get_df_from_file("sample_data/taxa.csv"), "www/taxa.rds")
 
 
   # === pigments DF setup ============================================
