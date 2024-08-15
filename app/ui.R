@@ -21,7 +21,7 @@ ui <- fluidPage(
   sidebarLayout(
     # Sidebar panel for inputs ----
     sidebarPanel(
-      img(src='img/vertical_collage.jpg', width="100%%"),
+      img(src='img/vertical_collage.jpg', width="100%"),
       width = 2
     ),
     # Main panel for displaying outputs ----
