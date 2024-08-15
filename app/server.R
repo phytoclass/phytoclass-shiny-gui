@@ -6,11 +6,14 @@ log_threshold(TRACE)
 
 # Helper functions ----
 source("R/get_df_from_file.R")
+source("modules/quartoReport/quartoReport.R")
 
 # Define server logic for app ----
 server <- function(input, output) {
-  # TODO: set up tabset disabling for user steps
-  # ref https://chat.openai.com/c/c26c74dc-2038-47fd-87e6-0f8015110215
+  # set up default files on app open
+  saveRDS(get_df_from_file("../sample_data/sm.csv"), "www/pigments.rds")
+  saveRDS(get_df_from_file("../sample_data/taxa.csv"), "www/taxa.rds")
+
 
   # === pigments DF setup ============================================
   observeEvent(input$pigments_file, {
@@ -32,7 +35,6 @@ server <- function(input, output) {
 
     # TODO: generate more clever filepath
     saveRDS(pigment_df, "www/taxa.rds")
-
   })
 
   # === quarto reports ========================================================

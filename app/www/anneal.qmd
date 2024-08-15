@@ -37,7 +37,7 @@ selectedCluster$Clust <- NULL
 
 Results <- phytoclass::simulated_annealing(
   S = selectedCluster,
-  F = taxa,
+  # F = taxa,
   niter = params$niter,  # number of iterations
   # user_defined_min_max = minMaxTable
   # TODO: place to upload table to replace

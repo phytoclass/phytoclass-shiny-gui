@@ -1,3 +1,5 @@
+source("modules/quartoReport/quartoReport.R")
+
 ui <- fluidPage(
   # App title ----
   titlePanel(markdown(paste0(
@@ -27,6 +29,10 @@ ui <- fluidPage(
       # Output: Tabset  ----
       tabsetPanel(type = "tabs",
         tabPanel("Upload Data Files",
+          markdown(paste0(
+            "Pigment samples (S matrix) and expected taxa lists (F matrix) ",
+            "can be uploaded here. Defaults will be used if you do not upload."
+          )),
           tabsetPanel(type = "tabs",
             tabPanel("Pigment Samples",
               markdown(paste0(
@@ -57,7 +63,7 @@ ui <- fluidPage(
               # `Ratio Matrix` (aka `F matrix`) is the ratio of pigments
               #       relative to chlorophyll a.
               # TODO: select preset dropdown (region)
-              selectInput("taxaPreset", "Taxa Preset", list("all", "antarctic")),
+              selectInput("taxaPreset", "Taxa Preset", list("all")),#, "antarctic")),
               # TODO: or custom preset upload
               fileInput("taxalist_file", "List of taxa .csv file.",
                 multiple = FALSE,
@@ -73,6 +79,11 @@ ui <- fluidPage(
           )
         ),
           tabPanel("Run Clustering",
+            markdown(paste0(
+              'Clustering is applied across all pigment samples to ',
+              'differentiate between samples taken under different conditions. ',
+              'A "dynamic tree cut" algorithm is applied to generate the tree.'
+            )),
             quartoReportUI("cluster",
               defaultSetupCode = paste(
                 "inputFile <- 'pigments.rds'",
@@ -83,12 +94,19 @@ ui <- fluidPage(
             # TODO: save clusters .csv
           ),
           tabPanel("Inspect a Cluster",
+            markdown(paste0(
+              "Details about the selected cluster are shown here."
+            )),
             quartoReportUI("inspectCluster",
               defaultSetupCode = "selectedCluster <- 1"
             )
           ),
           tabPanel("Run Annealing on a Cluster",
-            # TODO: seed input & explanation
+            markdown(paste0(
+              "Simulated annealing is run to solve the least squares ",
+              "minimization problem to determine the most likely taxa in the ",
+              "pigment samples selected."
+            )),
             quartoReportUI("anneal",
               # TODO: fill these to match .qmd
               defaultSetupCode = paste(
