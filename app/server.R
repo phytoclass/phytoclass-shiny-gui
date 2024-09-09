@@ -34,7 +34,7 @@ server <- function(input, output) {
     # TODO: validate
 
     # TODO: generate more clever filepath
-    saveRDS(pigment_df, "www/taxa.rds")
+    saveRDS(taxalist_df, "www/taxa.rds")
   })
 
   # === quarto reports ========================================================
