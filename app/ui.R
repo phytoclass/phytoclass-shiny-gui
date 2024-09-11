@@ -123,15 +123,5 @@ ui <- fluidPage(
         ),
       width = 10
       )
-    ),
-  fluidRow(
-    img(src='img/footer_1.jpg', width="12%"),
-    img(src='img/footer_2.jpg', width="12%"),
-    img(src='img/footer_3.jpg', width="12%"),
-    img(src='img/footer_4.jpg', width="12%"),
-    img(src='img/footer_5.jpg', width="12%"),
-    img(src='img/footer_6.jpg', width="12%"),
-    img(src='img/footer_7.jpg', width="12%"),
-    img(src='img/footer_8.jpg', width="12%")
-  )
+    )
 )
