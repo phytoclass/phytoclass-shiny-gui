@@ -7,6 +7,7 @@ format:
 params:
   inputFile: "pigments.rds"
   outputFile: "clusters.rds"
+  minClusterSize: 14
 ---
 
 ```{R}
@@ -34,14 +35,14 @@ print(paste("Data loaded, length:", nrow(pigment_df)))
 
 result <- phytoclass::Cluster(
   pigment_df,
-  14  # min_cluster_size
+  params$min_cluster_size
 )
 ```
 
 ```{R}
 fname = params$outputFile
 saveRDS(result, file=fname)
-print(glue("cluster result saved to file {fname}"))
+print(glue("cluster result saved to file {fname} on the server."))
 ```
 
 ```{R}

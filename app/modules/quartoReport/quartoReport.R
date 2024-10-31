@@ -66,12 +66,17 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   ns <- NS(id)
   return(tagList(tabsetPanel(type = "tabs",
     tabPanel("input setup",
-      fileInput(ns("inputFile"), "upload file here OR define configuration below.",
-        width = "100%",
-        accept = ".rds",
-        buttonLabel = "input file",
-        placeholder = glue("{id}_input.rds")
-      ),
+      # fileInput(ns("inputFile"), "upload file here OR define configuration below.",
+      #   width = "100%",
+      #   accept = ".rds",
+      #   buttonLabel = "input file",
+      #   placeholder = glue("{id}_input.rds")
+      # ),
+      markdown(paste(
+        "## (optional) report customization",
+        "Change these default values for advanced usage.",
+        sep=""
+      )),
       textAreaInput(ns("setupInputCode"),
         label = "define setup variables here OR use .rds upload above OR leave defaults.",  # TODO: add link to help docs for paramters
         value = defaultSetupCode,

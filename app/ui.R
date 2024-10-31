@@ -36,7 +36,7 @@ ui <- fluidPage(
           tabsetPanel(type = "tabs",
             tabPanel("Pigment Samples",
               markdown(paste0(
-                "# Pigment Sample Matrix \n",
+                "# Pigment Sample Matrix (S Matrix)\n",
                 "Select a pigment concentrations file to supply the ",
                 "`Sample Matrix` (aka `S matrix`) of pigment samples. \n",
                 "[See here for details]",
@@ -48,13 +48,19 @@ ui <- fluidPage(
                   "text/comma-separated-values,text/plain",
                   ".csv"
                 )
+              ),
+              markdown("## File Loaded"),
+              # TODO: content section showing loaded file
               )
-              # TODO: toggle pigments on/off
             ),
             tabPanel("Taxa List",
               markdown(paste(
-                "# Taxa list",
-                "List of taxa expected in the sample.",
+                "# Taxa list (F Matrix)",
+                'Select "taxa expected in the sample file ',
+                "to supply the ",
+                "`F Matrix` of pigment-taxa contributions. \n",
+                "[See here for details]",
+                "(https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/F_matrix.md)",
                 sep = "\n"
               )),
               # TODO: OPTIONAL section
@@ -88,19 +94,20 @@ ui <- fluidPage(
               defaultSetupCode = paste(
                 "inputFile <- 'pigments.rds'",
                 "outputFile <- 'clusters.rds'",
+                "minClusterSize <- 14",
                 sep="\n"
               )
             )
-            # TODO: save clusters .csv
+            # TODO: download clusters .csv
           ),
-          tabPanel("Inspect a Cluster",
-            markdown(paste0(
-              "Details about the selected cluster are shown here."
-            )),
-            quartoReportUI("inspectCluster",
-              defaultSetupCode = "selectedCluster <- 1"
-            )
-          ),
+          # tabPanel("Inspect a Cluster",
+          #   markdown(paste0(
+          #     "Details about the selected cluster are shown here."
+          #   ))
+          #   quartoReportUI("inspectCluster",
+          #     defaultSetupCode = "selectedCluster <- 1"
+          #   )
+          # ),
           tabPanel("Run Annealing on a Cluster",
             markdown(paste0(
               "Simulated annealing is run to solve the least squares ",
