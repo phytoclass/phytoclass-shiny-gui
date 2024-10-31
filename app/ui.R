@@ -51,7 +51,6 @@ ui <- fluidPage(
               ),
               markdown("## File Loaded"),
               # TODO: content section showing loaded file
-              )
             ),
             tabPanel("Taxa List",
               markdown(paste(
