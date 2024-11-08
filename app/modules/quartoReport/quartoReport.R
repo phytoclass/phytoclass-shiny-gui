@@ -74,11 +74,13 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
       # ),
       markdown(paste(
         "## (optional) report customization",
-        "Change these default values for advanced usage.",
         sep=""
       )),
       textAreaInput(ns("setupInputCode"),
-        label = "define setup variables here OR use .rds upload above OR leave defaults.",  # TODO: add link to help docs for paramters
+        label = markdown(paste(
+          "(optional) Change these default values for advanced usage.",
+          " For details see [phytoclass docs](https://cran.r-project.org/web/packages/phytoclass/vignettes/phytoclass-vignette.html)."
+        )),
         value = defaultSetupCode,
         width = "100%",
         height = "15em",

@@ -35,7 +35,7 @@ print(paste("Data loaded, length:", nrow(pigment_df)))
 
 result <- phytoclass::Cluster(
   pigment_df,
-  params$min_cluster_size
+  params$minClusterSize
 )
 ```
 

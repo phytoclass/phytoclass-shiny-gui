@@ -24,6 +24,15 @@ library("glue")
 
 clusters <- readRDS(params$inputFile)
 taxa <- readRDS(params$taxaFile)
+
+# remove numeric rownames set by readRDS
+if (all(grepl("^[0-9]+$", rownames(taxa)))) {
+  # Set the first column as row names
+  rownames(taxa) <- taxa[[1]]
+  
+  # Remove the first column
+  taxa <- taxa[, -1] 
+}
 ```
 
 ```{R, run annealing}

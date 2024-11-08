@@ -1,9 +1,6 @@
 # chemtax-shiny-gui
 GUI built using R.shiny for CHEMTAX
 
-# TODO:
-* focus on taxa upload/selection
-
 # Setup
 ## ubuntu
 ```bash
@@ -17,9 +14,9 @@ devtools::install_local()
 ```
 
 
-global.R: data prep and library loading
-ui.R: user interface
-server.R: server functions
+* global.R: data prep and library loading
+* ui.R: user interface
+* server.R: server functions
 
 
 # quartoReport module 
@@ -141,7 +138,7 @@ TODO:
 
 * error when changing cluster number then running annealing:
 ```
-[91mERROR: YAML file clusters.rds not found.
+[91mERROR: YAML file clusters.rds not found.
 
 Stack trace:
     at readYaml (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:19621:15)
@@ -153,5 +150,5 @@ Stack trace:
     at async Command.actionHandler (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:83075:32)
     at async Command.execute (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:8017:13)
     at async Command.parseCommand (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:7907:20)
-    at async quarto (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:118217:9)[39m
+    at async quarto (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:118217:9)[39m
 ```
