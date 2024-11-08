@@ -42,7 +42,7 @@ buildContext <- function(input, output, execParams){
     contextParams
   })
 
-  contextRDSPath <- "context.rds"  # TODO: generate better filename (with hash?)
+  contextRDSPath <- "www/context.rds"  # TODO: generate better filename (with hash?)
 
   saveRDS(contextParams, file = contextRDSPath)
   return(contextRDSPath)

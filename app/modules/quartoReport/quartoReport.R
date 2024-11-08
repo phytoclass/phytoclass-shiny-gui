@@ -9,6 +9,10 @@ actualRenderReport <- function(
 ){
   # render quarto report immediately using given context
   # should be used in a callback (later) to avoid UI lockup
+  print("rendering....")
+  # print(glue("context: {contextRDS}"))
+  # print(glue("execParams: {exec_params}"))
+
   tryCatch({
     # Run the command and capture output and error messages
     output_message <- system2(
@@ -52,6 +56,8 @@ renderReport <- function(
 ){
   # renderReport schedules the render for later so that the "generating report..." text shows immediately
   print(glue("generating report '{id}'..."))
+  print(glue("context: {contextRDS}"))
+
   output$output = renderUI(renderText("generating report..."))
   exec_params = execParams()  # do this now, use it later
   later::later(function(){
@@ -110,7 +116,7 @@ quartoReportServer <- function(id){
     # Create an object for the exec_params
     execParams <- reactiveVal(list())
     # TODO: replace execParams with contextRDSPath
-    contextRDSPath <- reactiveVal(NULL)
+    contextRDSPath <- reactiveVal("context.rds")
 
     # === generate the quarto report =========================================
     observeEvent(input$generateButton, {
@@ -122,7 +128,7 @@ quartoReportServer <- function(id){
     })
 
     # === environment upload ================================================
-    # TODO:
+    # TODO: upload context.rds
 
     # === environment reload button =========================================
     observeEvent(input$reloadEnvButton, {
