@@ -1,11 +1,12 @@
 library(yaml)
 
-buildContext <- function(input, output){
+buildContext <- function(inputCode, output){
   # create context file from inputs
   print("reloading environment...")
 
   # Get the code from the text area input
-  code <- input$setupInputCode
+  print(glue("inputCode: {inputCode}"))
+  code <- inputCode
 
   # Split the code into individual expressions
   expressions <- strsplit(code, "\n")[[1]]

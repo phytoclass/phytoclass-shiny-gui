@@ -5,18 +5,20 @@ library(here)
 source("modules/quartoReport/buildContext.R")
 
 actualRenderReport <- function(
-    contextRDS, output, qmd_path, reportHTMLPath
+    contextRDSPath, inputCode, output, qmd_path, reportHTMLPath
 ){
   # render quarto report immediately using given context
   # should be used in a callback (later) to avoid UI lockup
   print("rendering....")
-  print(glue("context: {contextRDS}"))
+  print(glue("inputCode: {inputCode}"))
+  contextRDSPath(buildContext(inputCode, output))
+  print(glue("context: {contextRDSPath()}"))
 
   tryCatch({
     # Run the command and capture output and error messages
     output_message <- system2(
       command = "quarto",
-      args = c("render", qmd_path, "--execute-params", contextRDS),
+      args = c("render", qmd_path, "--execute-params", contextRDSPath()),
       stdout = TRUE, stderr = TRUE,
       wait = TRUE
     )
@@ -51,20 +53,28 @@ actualRenderReport <- function(
 }
 
 renderReport <- function(
-    contextRDS, output, qmd_path, reportHTMLPath, id
+    contextRDSPath, setupInputCode, output, qmd_path, reportHTMLPath, id
 ){
   # renderReport schedules the render for later so that the "generating report..." text shows immediately
   print(glue("generating report '{id}'..."))
-  print(glue("context: {contextRDS}"))
 
-  output$output = renderUI(renderText("generating report..."))
-  later::later(function(){
-    actualRenderReport(
-      contextRDS,
-      output,
-      qmd_path, reportHTMLPath
-    )
-  }, 0.1) # Schedule this to run immediately after the initial output
+  # TODO: get this working again:
+  output$output = renderUI(renderText("generating report...."))
+  # later::later(function(){
+  #   actualRenderReport(
+  #     contextRDSPath,
+  #     setupInputCode,
+  #     output,
+  #     qmd_path, reportHTMLPath
+  #   )
+  # }, 0.1) # Schedule this to run immediately after the initial output
+
+  actualRenderReport(
+    contextRDSPath,
+    setupInputCode,
+    output,
+    qmd_path, reportHTMLPath
+  )
 }
 quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   ns <- NS(id)
@@ -89,11 +99,14 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
         width = "100%",
         height = "15em",
         resize = "both"
-      ),
-      actionButton(ns("reloadEnvButton"), "load variables from text input")
+      )
     ), tabPanel("generate report",
       verbatimTextOutput(ns("execParamsDisplay")),
       actionButton(ns("generateButton"), "generate report"),
+      markdown(c(
+        "NOTE: please be patient after clicking this button. ",
+        "Rendering can take multiple minutes depending on settings."
+      )),
       htmlOutput(ns("output"))
     )
     # TODO:
@@ -116,8 +129,10 @@ quartoReportServer <- function(id){
 
     # === generate the quarto report =========================================
     observeEvent(input$generateButton, {
+      output$output = renderUI(renderText("generating report..."))
       renderReport(
-        contextRDSPath(),    # TODO: use real context.rds path
+        contextRDSPath,
+        input$setupInputCode,
         output,
         qmd_path, reportHTMLPath, id
       )
@@ -125,11 +140,6 @@ quartoReportServer <- function(id){
 
     # === environment upload ================================================
     # TODO: upload context.rds
-
-    # === environment reload button =========================================
-    observeEvent(input$reloadEnvButton, {
-      contextRDSPath(buildContext(input, output))
-    })
 
     # TODO: download output button controller
     # TODO: download report button controller

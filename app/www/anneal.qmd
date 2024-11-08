@@ -9,7 +9,7 @@ params:
   taxaFile: "taxa.rds"
   outputFile: "anneal.rds"
   seed: 7683
-  selected_cluster: 1
+  selected_cluster: 2
   niter: 10
 ---
 
