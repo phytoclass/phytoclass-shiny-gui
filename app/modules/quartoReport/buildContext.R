@@ -1,6 +1,7 @@
+library(yaml)
 
-buildContext <- function(input, output, execParams){
-  # create context .rds from inputs
+buildContext <- function(input, output){
+  # create context file from inputs
   print("reloading environment...")
 
   # Get the code from the text area input
@@ -11,6 +12,8 @@ buildContext <- function(input, output, execParams){
 
   # Initialize an empty list to store variable declarations
   var_declarations <- list()
+
+  execParams <- list()
 
   # Evaluate each expression and store variable declarations
   for (expr in expressions) {
@@ -29,21 +32,20 @@ buildContext <- function(input, output, execParams){
       var_name <- as.character(parsed_expr[[1]][[2]])
       var_value <- get(var_name, envir = .GlobalEnv)
       print(glue("execParam set {var_name}<-{var_value}"))
-      tempList <- execParams()
-      tempList[[var_name]] <- var_value
-      execParams(tempList)
+      execParams[[var_name]] <- var_value
     } else {
       print(glue("error in param expression: '{expr}'"))
     }
   }
-  contextParams <- execParams()
+  contextParams <- execParams
   # Display the current values of exec_params in monospace
   output$execParamsDisplay <- renderPrint({
     contextParams
   })
 
-  contextRDSPath <- "www/context.rds"  # TODO: generate better filename (with hash?)
+  contextPath <- "www/context.yaml"  # TODO: generate better filename (with hash?)
 
-  saveRDS(contextParams, file = contextRDSPath)
-  return(contextRDSPath)
+  # Save to YAML file
+  write_yaml(contextParams, contextPath)
+  return(contextPath)
 }

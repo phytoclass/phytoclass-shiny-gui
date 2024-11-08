@@ -5,19 +5,18 @@ library(here)
 source("modules/quartoReport/buildContext.R")
 
 actualRenderReport <- function(
-    contextRDS, output, qmd_path, exec_params, reportHTMLPath
+    contextRDS, output, qmd_path, reportHTMLPath
 ){
   # render quarto report immediately using given context
   # should be used in a callback (later) to avoid UI lockup
   print("rendering....")
-  # print(glue("context: {contextRDS}"))
-  # print(glue("execParams: {exec_params}"))
+  print(glue("context: {contextRDS}"))
 
   tryCatch({
     # Run the command and capture output and error messages
     output_message <- system2(
       command = "quarto",
-      args = c("render", qmd_path, "--execute-params", exec_params),
+      args = c("render", qmd_path, "--execute-params", contextRDS),
       stdout = TRUE, stderr = TRUE,
       wait = TRUE
     )
@@ -52,19 +51,18 @@ actualRenderReport <- function(
 }
 
 renderReport <- function(
-    contextRDS, output, qmd_path, execParams, reportHTMLPath, id
+    contextRDS, output, qmd_path, reportHTMLPath, id
 ){
   # renderReport schedules the render for later so that the "generating report..." text shows immediately
   print(glue("generating report '{id}'..."))
   print(glue("context: {contextRDS}"))
 
   output$output = renderUI(renderText("generating report..."))
-  exec_params = execParams()  # do this now, use it later
   later::later(function(){
     actualRenderReport(
       contextRDS,
       output,
-      qmd_path, exec_params, reportHTMLPath
+      qmd_path, reportHTMLPath
     )
   }, 0.1) # Schedule this to run immediately after the initial output
 }
@@ -114,16 +112,14 @@ quartoReportServer <- function(id){
   reportHTMLPath <- glue("{id}.html")
   moduleServer(id, function(input, output, session){
     # Create an object for the exec_params
-    execParams <- reactiveVal(list())
-    # TODO: replace execParams with contextRDSPath
-    contextRDSPath <- reactiveVal("context.rds")
+    contextRDSPath <- reactiveVal("www/context.yaml")
 
     # === generate the quarto report =========================================
     observeEvent(input$generateButton, {
       renderReport(
         contextRDSPath(),    # TODO: use real context.rds path
         output,
-        qmd_path, execParams, reportHTMLPath, id
+        qmd_path, reportHTMLPath, id
       )
     })
 
@@ -132,7 +128,7 @@ quartoReportServer <- function(id){
 
     # === environment reload button =========================================
     observeEvent(input$reloadEnvButton, {
-      contextRDSPath(buildContext(input, output, execParams))
+      contextRDSPath(buildContext(input, output))
     })
 
     # TODO: download output button controller
