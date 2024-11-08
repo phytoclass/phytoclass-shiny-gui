@@ -38,6 +38,10 @@ if (all(grepl("^[0-9]+$", rownames(taxa)))) {
 ```{R, run annealing}
 set.seed(params$seed)
 
+if (params$selected_cluster > length(clusters$cluster.list)){
+  stop("selected cluster is greater than number of clusters")
+}
+
 selectedCluster <- clusters$cluster.list[[
   params$selected_cluster
 ]]
