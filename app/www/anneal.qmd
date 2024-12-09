@@ -24,20 +24,40 @@ library("glue")
 
 clusters <- readRDS(params$inputFile)
 taxa <- readRDS(params$taxaFile)
+```
 
-# remove numeric rownames set by readRDS
+```{R}
+#| code-summary: clean up taxa matrix if needed
+# === remove numeric rownames set by readRDS
 if (all(grepl("^[0-9]+$", rownames(taxa)))) {
+  print("dropping unneeded numeric index")
   # Set the first column as row names
   rownames(taxa) <- taxa[[1]]
   
   # Remove the first column
   taxa <- taxa[, -1] 
 }
+
+# === drop any all-zero columns
+original_colnames <- colnames(taxa)
+
+# do the subset
+taxa <- taxa[, colSums(taxa) != 0]
+
+# Find the column names that were dropped
+dropped_colnames <- setdiff(original_colnames, colnames(taxa))
+
+# Print a message if any columns were dropped
+if (length(dropped_colnames) > 0) {
+  cat(
+    length(dropped_colnames), 
+    "F-matrix columns dropped because they contained only zeros:\n"
+    )
+  cat(paste(dropped_colnames, collapse = ", "), "\n")
+}
 ```
-
-```{R, run annealing}
-set.seed(params$seed)
-
+```{R}
+#| code-summary: prep S matrix
 if (params$selected_cluster > length(clusters$cluster.list)){
   stop("selected cluster is greater than number of clusters")
 }
@@ -47,6 +67,45 @@ selectedCluster <- clusters$cluster.list[[
 ]]
 # log_trace("Remove cluster column/label")
 selectedCluster$Clust <- NULL
+```
+
+```{R}
+#| code-summary: find mismatches between F and S
+# Assume taxa and selectedCluster are the two matrices
+headers1 <- colnames(taxa)
+headers2 <- colnames(selectedCluster)
+
+# Find headers in taxa that are not in selectedCluster
+only_in_mtx1 <- setdiff(headers1, headers2)
+
+# Find headers in selectedCluster that are not in taxa
+only_in_mtx2 <- setdiff(headers2, headers1)
+
+# Find headers common to both matrices
+common_headers <- intersect(headers1, headers2)
+
+# Print the results
+if (! length(common_headers) > 0){
+  cat(
+    "Headers only in taxa:\n", 
+    paste(only_in_mtx1, collapse = ", "), 
+    "\n"
+  )
+  cat(
+    "Headers only in selectedCluster:\n", 
+    paste(only_in_mtx2, collapse = ", "), 
+    "\n"
+  )
+  cat(
+    "Headers common to both matrices:\n", 
+    paste(common_headers, collapse = ", "), 
+    "\n"
+  )
+}
+```
+
+```{R, run annealing}
+set.seed(params$seed)
 
 Results <- phytoclass::simulated_annealing(
   S = selectedCluster,
