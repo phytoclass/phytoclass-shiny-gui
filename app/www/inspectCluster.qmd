@@ -6,6 +6,7 @@ format:
     standalone: true
 params:
   inputFile: "clusters.rds"
+  selected_cluster: 2
 ---
 
 ```{R}
@@ -21,6 +22,13 @@ cluster_df <- readRDS(params$inputFile)
 ```
 
 ```{R}
-#| code-summary: plotly cluster display?
+#| code-summary: show samples in cluster
+selectedCluster <- cluster_df$cluster.list[[
+  params$selected_cluster
+]]
+# log_trace("Remove cluster column/label")
+selectedCluster$Clust <- NULL
+
+print(selectedCluster)
 ```
 

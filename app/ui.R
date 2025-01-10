@@ -1,5 +1,8 @@
 source("modules/quartoReport/quartoReport.R")
 
+# TODO: links should open in new window
+# TODO: update links to point to new docs page
+
 ui <- fluidPage(
   # App title ----
   titlePanel(markdown(paste0(
@@ -99,14 +102,14 @@ ui <- fluidPage(
             )
             # TODO: download clusters .csv
           ),
-          # tabPanel("Inspect a Cluster",
-          #   markdown(paste0(
-          #     "Details about the selected cluster are shown here."
-          #   ))
-          #   quartoReportUI("inspectCluster",
-          #     defaultSetupCode = "selectedCluster <- 1"
-          #   )
-          # ),
+          tabPanel("Inspect a Cluster",
+            markdown(paste0(
+              "Details about the selected cluster are shown here."
+            )),
+            quartoReportUI("inspectCluster",
+              defaultSetupCode = "selected_cluster <- 1"
+            )
+          ),
           tabPanel("Run Annealing on a Cluster",
             markdown(paste0(
               "Simulated annealing is run to solve the least squares ",
