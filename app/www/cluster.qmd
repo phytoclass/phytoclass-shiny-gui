@@ -7,7 +7,7 @@ format:
 params:
   inputFile: "pigments.rds"
   outputFile: "clusters.rds"
-  minClusterSize: 14
+  minClusterSize: 20
 ---
 
 ```{R}
@@ -55,10 +55,13 @@ plot(result$cluster.plot)
 
 ```{R}
 #| code-summary: print number of clusters
-print(length(result$cluster.list[[1]][[1]]))
+print(length(result$cluster.list))
 ```
 
 ```{R}
-#| code-summary: plotly cluster display?
+#| code-summary: cluster table
+
+# TODO: print table that shows which samples are in each cluster
+#       show just one cluster (inspectCluster.qmd?)
 ```
 
