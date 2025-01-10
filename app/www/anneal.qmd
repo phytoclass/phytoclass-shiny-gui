@@ -101,6 +101,7 @@ if (! length(common_headers) > 0){
     paste(common_headers, collapse = ", "), 
     "\n"
   )
+  stop("ERR: S and F matrix have different columns.")
 }
 ```
 
