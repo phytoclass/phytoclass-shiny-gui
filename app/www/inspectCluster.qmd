@@ -6,7 +6,7 @@ format:
     standalone: true
 params:
   inputFile: "clusters.rds"
-  selected_cluster: 2
+  selected_cluster: 1
 ---
 
 ```{R}
@@ -32,3 +32,22 @@ selectedCluster$Clust <- NULL
 print(selectedCluster)
 ```
 
+```{R}
+df <- selectedCluster
+
+library(ggplot2)
+library(tidyr)
+
+# Convert df to a long format
+df_long <- pivot_longer(df, cols = everything(), 
+                        names_to = "Variable", 
+                        values_to = "Value")
+
+# Create histograms with facets
+ggplot(df_long, aes(x = Value)) +
+  geom_histogram(bins = 30, fill = "skyblue", color = "black") +
+  facet_wrap(~ Variable, scales = "free_x") +
+  labs(title = "Histograms for Each Column", x = "Value", y = "Frequency")
+
+
+```
