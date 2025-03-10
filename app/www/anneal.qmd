@@ -9,7 +9,7 @@ params:
   taxaFile: "taxa.rds"
   outputFile: "anneal.rds"
   seed: 7683
-  selected_cluster: 2
+  selected_cluster: 1
   niter: 10
 ---
 
@@ -71,6 +71,7 @@ selectedCluster$Clust <- NULL
 
 ```{R}
 #| code-summary: find mismatches between F and S
+# TODO: also check this for the min_max matrix
 # Assume taxa and selectedCluster are the two matrices
 headers1 <- colnames(taxa)
 headers2 <- colnames(selectedCluster)
@@ -126,10 +127,12 @@ print(Results$Figure)
 
 print("Mean Absolute Error (MAE):")
 print(Results$MAE)
+# 
+# print("F matrix:")
+# print(Results$`F matrix`)
 
-print("F matrix:")
-print(Results$`F matrix`)
+print("Class Abundances:")
+write.table(Results$`Class abundances`, row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 
 ```
 
-TODO: write annealing result to file?
