@@ -107,6 +107,7 @@ if (! length(common_headers) > 0){
 ```
 
 ```{R, run annealing}
+#| code-summary: run annealing
 set.seed(params$seed)
 
 Results <- phytoclass::simulated_annealing(
@@ -118,7 +119,10 @@ Results <- phytoclass::simulated_annealing(
   #       phytoclass::min_max table
   verbose = FALSE
 )
+```
 
+```{R, show results}
+#| code-summary: show results
 print(glue("
  completed w/ RMSE {Results$RMSE}
 "))
@@ -131,8 +135,7 @@ print(Results$MAE)
 # print("F matrix:")
 # print(Results$`F matrix`)
 
-print("Class Abundances:")
-write.table(Results$`Class abundances`, row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-
+library(pander)
+pander(Results$`Class abundances`, digits = 6)
 ```
 
