@@ -132,8 +132,8 @@ print(Results$Figure)
 print("Mean Absolute Error (MAE):")
 print(Results$MAE)
 # 
-# print("F matrix:")
-# print(Results$`F matrix`)
+print("F matrix:")
+print(Results$`F matrix`)
 
 library(pander)
 pander(Results$`Class abundances`, digits = 6)
