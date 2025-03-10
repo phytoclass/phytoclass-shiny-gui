@@ -1,5 +1,15 @@
-# chemtax-shiny-gui
-GUI built using R.shiny for CHEMTAX
+# phytoclass-shiny-gui
+GUI built using R.shiny for CHEMTAX and phytoclass users.
+
+TODO:
+* sample names added to S matrix
+* TEMPO_F is missing chlor_a on end
+* TEMPO_F want to try with Diatoms-a
+* code for matrix checking from anneal.qmd into phytoclass
+* test with older F matrix from Karen
+* taxa preset OR upload F matrix
+* add options to clustering
+  * distanceType (manhattan etc)
 
 # Setup
 ## ubuntu
@@ -123,32 +133,4 @@ report --> downloadReport{{"Download Report"}}
 downloadContext{{"Download Context"}}
 postRenderContext --> downloadContext
 preRenderContext --> downloadContext
-```
-
-
-TODO:
-
-* taxa preset OR upload F matrix
-* add options to clustering
-  * add minimumSize
-  * distanceType (manhattan etc)
-  * change shinyapps.io/chemtax to shinyapps.io/phytoclass-app
-* note niter usually in hundreds
-
-
-* error when changing cluster number then running annealing:
-```
-[91mERROR: YAML file clusters.rds not found.
-
-Stack trace:
-    at readYaml (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:19621:15)
-    at resolveParams (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:21175:35)
-    at renderExecute (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:78024:17)
-    at renderFileInternal (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:78199:49)
-    at async renderFiles (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:78067:17)
-    at async render (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:82927:21)
-    at async Command.actionHandler (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:83075:32)
-    at async Command.execute (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:8017:13)
-    at async Command.parseCommand (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:7907:20)
-    at async quarto (file:///opt/quarto/jammy/1.5.53/bin/quarto.js:118217:9)[39m
 ```
