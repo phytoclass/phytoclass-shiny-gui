@@ -88,21 +88,19 @@ ui <- fluidPage(
           )
         ),
         tabPanel("Run Clustering",
-                 markdown(paste0(
-                   'Clustering is applied across all pigment samples to ',
-                   'differentiate between samples taken under different conditions. ',
-                   'A "dynamic tree cut" algorithm is applied to generate the tree.'
-                 )),
-                 quartoReportUI("cluster",
-                                defaultSetupCode = paste(
-                                  "inputFile <- 'pigments.rds'",
-                                  "outputFile <- 'clusters.rds'",
-                                  "minSamplesPerCluster <- 14",
-                                  sep="\n"
-                                )
-                              ),
-                 br(),
-                 downloadButton("downloadClusters", "Download Clusters (.csv)")
+          markdown(paste0(
+            'Clustering is applied across all pigment samples to ',
+            'differentiate between samples taken under different conditions. ',
+            'A "dynamic tree cut" algorithm is applied to generate the tree.'
+            )),
+            quartoReportUI("cluster",
+              defaultSetupCode = paste(
+                "inputFile <- 'pigments.rds'",
+                "outputFile <- 'clusters.rds'",
+                "minSamplesPerCluster <- 14",
+                sep="\n"
+                )
+            )
           ),
         
           tabPanel("Inspect a Cluster",
@@ -111,7 +109,8 @@ ui <- fluidPage(
             )),
             quartoReportUI("inspectCluster",
               defaultSetupCode = "selected_cluster <- 1"
-            )
+            ),
+            downloadButton("downloadCluster", "Download Inspected Cluster CSV")
           ),
           tabPanel("Run Annealing on a Cluster",
             markdown(paste0(
@@ -127,7 +126,7 @@ ui <- fluidPage(
                 "outputFile <- 'annealing.rds'",
                 "seed <- 0",
                 "selected_cluster <- 1",
-                "niter <- 10",
+                "niter <- 500",
                 sep="\n"
               )
             )
