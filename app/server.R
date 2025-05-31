@@ -14,7 +14,18 @@ server <- function(input, output) {
   saveRDS(get_df_from_file("sample_data/sm.csv"), "www/pigments.rds")
   saveRDS(get_df_from_file("sample_data/taxa.csv"), "www/taxa.rds")
 
-
+  # Reactive value to store selected cluster
+  selected_cluster <- reactiveVal(1)
+  
+  # Observe changes from inspectCluster module
+  observe({
+    # This assumes your quartoReport module updates input$inspectCluster-selected_cluster
+    if (!is.null(input[["inspectCluster-selected_cluster"]])) {
+      selected_cluster(input[["inspectCluster-selected_cluster"]])
+    }
+  })
+  
+  
   # === pigments DF setup ============================================
   observeEvent(input$pigments_file, {
     log_trace("pigment file changed")
@@ -46,6 +57,29 @@ server <- function(input, output) {
 
   # annealing report
   quartoReportServer("anneal")
+  
+  # === cluster download =================================
+  output$downloadCluster <- downloadHandler(
+    filename = function() {
+      paste0("cluster.csv")
+    },
+    content = function(file) {
+      req(file.exists("www/clusters.rds"))
+      cluster_df <- readRDS("www/clusters.rds")
+      
+      # Validate cluster exists
+      req(length(cluster_df$cluster.list) >= selected_cluster())
+      
+      selected_cluster_data <- cluster_df$cluster.list[[selected_cluster()]]
+      
+      # Remove cluster column if exists
+      if ("Clust" %in% colnames(selected_cluster_data)) {
+        selected_cluster_data$Clust <- NULL
+      }
+      
+      write.csv(selected_cluster_data, file, row.names = TRUE)
+    }
+  )
 }
 
 
