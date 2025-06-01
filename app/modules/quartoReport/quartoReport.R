@@ -79,7 +79,17 @@ renderReport <- function(
 quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   ns <- NS(id)
   return(tagList(tabsetPanel(type = "tabs",
-    tabPanel("input setup",
+    tabPanel("generate report",
+    verbatimTextOutput(ns("execParamsDisplay")),
+    tags$br(),
+    actionButton(ns("generateButton"), "generate report"),
+    markdown(c(
+      "NOTE: please be patient after clicking this button. ",
+      "Rendering can take multiple minutes depending on settings."
+      )),
+    htmlOutput(ns("output"))
+    ),
+    tabPanel("advanced configuration",
       # fileInput(ns("inputFile"), "upload file here OR define configuration below.",
       #   width = "100%",
       #   accept = ".rds",
@@ -100,14 +110,6 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
         height = "15em",
         resize = "both"
       )
-    ), tabPanel("generate report",
-      verbatimTextOutput(ns("execParamsDisplay")),
-      actionButton(ns("generateButton"), "generate report"),
-      markdown(c(
-        "NOTE: please be patient after clicking this button. ",
-        "Rendering can take multiple minutes depending on settings."
-      )),
-      htmlOutput(ns("output"))
     )
     # TODO:
     # tabPanel("download results",
