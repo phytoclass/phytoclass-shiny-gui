@@ -7,7 +7,7 @@ format:
 params:
   inputFile: "pigments.rds"
   outputFile: "clusters.rds"
-  minClusterSize: 20
+  minSamplesPerCluster: 20
 ---
 
 ```{R}
@@ -35,7 +35,7 @@ print(paste("Data loaded, length:", nrow(pigment_df)))
 
 result <- phytoclass::Cluster(
   pigment_df,
-  params$minClusterSize
+  params$minSamplesPerCluster
 )
 ```
 

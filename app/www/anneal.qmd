@@ -10,7 +10,7 @@ params:
   outputFile: "anneal.rds"
   seed: 7683
   selected_cluster: 1
-  niter: 10
+  niter: 500
 ---
 
 ```{R}

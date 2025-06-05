@@ -4,6 +4,7 @@ source("modules/quartoReport/quartoReport.R")
 # TODO: update links to point to new docs page
 
 ui <- fluidPage(
+  title = "Phytoclass-App",
   # App title ----
   titlePanel(markdown(paste0(
     "# Phytoplankton-From-Pigments GUI v0.0.1.0 \n",
@@ -86,29 +87,30 @@ ui <- fluidPage(
             )
           )
         ),
-          tabPanel("Run Clustering",
-            markdown(paste0(
-              'Clustering is applied across all pigment samples to ',
-              'differentiate between samples taken under different conditions. ',
-              'A "dynamic tree cut" algorithm is applied to generate the tree.'
+        tabPanel("Run Clustering",
+          markdown(paste0(
+            'Clustering is applied across all pigment samples to ',
+            'differentiate between samples taken under different conditions. ',
+            'A "dynamic tree cut" algorithm is applied to generate the tree.'
             )),
             quartoReportUI("cluster",
               defaultSetupCode = paste(
                 "inputFile <- 'pigments.rds'",
                 "outputFile <- 'clusters.rds'",
-                "minClusterSize <- 14",
+                "minSamplesPerCluster <- 14",
                 sep="\n"
-              )
+                )
             )
-            # TODO: download clusters .csv
           ),
+        
           tabPanel("Inspect a Cluster",
             markdown(paste0(
               "Details about the selected cluster are shown here."
             )),
             quartoReportUI("inspectCluster",
               defaultSetupCode = "selected_cluster <- 1"
-            )
+            ),
+            downloadButton("downloadCluster", "Download Inspected Cluster CSV")
           ),
           tabPanel("Run Annealing on a Cluster",
             markdown(paste0(
@@ -124,7 +126,7 @@ ui <- fluidPage(
                 "outputFile <- 'annealing.rds'",
                 "seed <- 0",
                 "selected_cluster <- 1",
-                "niter <- 10",
+                "niter <- 500",
                 sep="\n"
               )
             )
