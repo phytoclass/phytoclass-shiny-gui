@@ -118,6 +118,10 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
     verbatimTextOutput(ns("execParamsDisplay")),
     tags$br(),
     actionButton(ns("generateButton"), "generate report"),
+    
+    # Add a loading spinner while output is rendering
+    shinycssloaders::withSpinner(uiOutput(ns("spinnerOutput"))),
+    
     markdown(c(
       "NOTE: please be patient after clicking this button. ",
       "Rendering can take multiple minutes depending on settings."
@@ -179,8 +183,23 @@ quartoReportServer <- function(id){
     # Flag to track if report has been generated
     reportGenerated <- reactiveVal(FALSE)
 
+    # Conditionally show a message while the report is being generated, otherwise show nothing
+    output$spinnerOutput <- renderUI({
+      if (is.null(input$generateButton) || input$generateButton == 0) {
+        return(NULL)
+      } else if (!reportGenerated()) {
+        return(tags$div(
+          style = "text-align: center;",
+          tags$p("Generating report...")
+        ))
+      } else {
+        return(NULL)
+      }
+    })
+    
     # === generate the quarto report =========================================
     observeEvent(input$generateButton, {
+      reportGenerated(FALSE)
       output$output = renderUI(renderText("generating report..."))
       renderReport(
         contextRDSPath,
