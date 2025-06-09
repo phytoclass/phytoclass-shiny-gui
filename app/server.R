@@ -1,6 +1,7 @@
 # Define UI for CHEMTAX app ----
-library("glue")
-library("logger")
+library(glue)
+library(logger)
+library(digest)
 
 log_threshold(TRACE)
 
@@ -9,10 +10,15 @@ source("R/get_df_from_file.R")
 source("modules/quartoReport/quartoReport.R")
 
 # Define server logic for app ----
-server <- function(input, output) {
-  # set up default files on app open
-  saveRDS(get_df_from_file("sample_data/sm.csv"), "www/pigments.rds")
-  saveRDS(get_df_from_file("sample_data/taxa.csv"), "www/taxa.rds")
+server <- function(input, output, session) {
+  
+  # Create unique session directory inside www
+  session_dir <- file.path("www", paste0("session-", session$token))
+  if (!dir.exists(session_dir)) dir.create(session_dir)
+  
+ # Save default files in session_dir instead of www root
+  saveRDS(get_df_from_file("sample_data/sm.csv"), file.path(session_dir, "pigments.rds"))
+  saveRDS(get_df_from_file("sample_data/taxa.csv"), file.path(session_dir, "taxa.rds"))
   
   # Reactive value to store selected cluster
   selected_cluster <- reactiveVal(1)
@@ -35,7 +41,7 @@ server <- function(input, output) {
     # TODO: validate
     
     # TODO: generate more clever filepath
-    saveRDS(pigment_df, "www/pigments.rds")
+    saveRDS(pigment_df, file.path(session_dir, "pigments.rds"))
   })
   
   # === taxa list DF setup ===========================================
@@ -45,18 +51,14 @@ server <- function(input, output) {
     # TODO: validate
     
     # TODO: generate more clever filepath
-    saveRDS(taxalist_df, "www/taxa.rds")
+    saveRDS(taxalist_df, file.path(session_dir, "taxa.rds"))
   })
   
   # === quarto reports ========================================================
-  # cluster selection
-  quartoReportServer("cluster")
-  
-  # cluster inspector
-  quartoReportServer("inspectCluster")
-  
-  # annealing report
-  quartoReportServer("anneal")
+  quartoReportServer("cluster", session_dir = session_dir)
+  quartoReportServer("inspectCluster", session_dir = session_dir)
+  quartoReportServer("anneal", session_dir = session_dir)
+
   
   # === cluster download =================================
   output$downloadCluster <- downloadHandler(
@@ -64,8 +66,9 @@ server <- function(input, output) {
       paste0("cluster.csv")
     },
     content = function(file) {
-      req(file.exists("www/clusters.rds"))
-      cluster_df <- readRDS("www/clusters.rds")
+      cluster_path <- file.path(session_dir, "clusters.rds")
+      req(file.exists(cluster_path))
+      cluster_df <- readRDS(cluster_path)
       
       # Validate cluster exists
       req(length(cluster_df$cluster.list) >= selected_cluster())

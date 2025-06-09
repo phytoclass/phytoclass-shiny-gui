@@ -1,19 +1,21 @@
 library(later)
 library(glue)
 library(here)
+library(digest)
 
 # Load function to build the context for report rendering
 source("modules/quartoReport/buildContext.R")
 
 # === Function to actually render the report =========
 actualRenderReport <- function(
-    contextRDSPath, inputCode, output, qmd_path, reportHTMLPath, reportPDFPath, reportQMDPath, id
+    contextRDSPath, inputCode, output, qmd_path, reportHTMLPath, reportPDFPath, 
+    reportQMDPath, id, session_id, session_dir
 ){
   print("rendering....")
   print(glue("inputCode: {inputCode}"))
   
   # Save the context built using the input code
-  contextRDSPath(buildContext(inputCode, output))
+  contextRDSPath(buildContext(inputCode, output, session_id, session_dir))
   
   # Copy the QMD file to be used in the report
   file.copy(qmd_path, reportQMDPath, overwrite = TRUE)
@@ -22,7 +24,8 @@ actualRenderReport <- function(
     #==== Render HTML report ===========================
     output_message <- system2(
       command = "quarto",
-      args = c("render", qmd_path, "--execute-params", contextRDSPath()),
+      args = c("render", qmd_path, "--execute-params", contextRDSPath(), 
+               "-P", paste0("session_dir:", session_dir)),
       stdout = TRUE, stderr = TRUE,
       wait = TRUE
     )
@@ -80,7 +83,8 @@ actualRenderReport <- function(
 
 # === Schedules and triggers the report rendering =================================
 renderReport <- function(
-    contextRDSPath, setupInputCode, output, qmd_path, reportHTMLPath, id, reportPDFPath, reportQMDPath
+    contextRDSPath, setupInputCode, output, qmd_path, reportHTMLPath, id, 
+    reportPDFPath, reportQMDPath, session_id, session_dir
 ){
   # renderReport schedules the render for later so that the "generating report..." text shows immediately
   print(glue("generating report '{id}'..."))
@@ -104,7 +108,9 @@ renderReport <- function(
     qmd_path, reportHTMLPath,
     reportPDFPath,
     reportQMDPath,
-    id
+    id, 
+    session_id,
+    session_dir
   )
 }
 
@@ -166,7 +172,9 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
 
 
 # === Server Logic for Quarto Report Module ==================================
-quartoReportServer <- function(id){
+quartoReportServer <- function(id, session_dir = NULL){
+  session_dir <- basename(session_dir)
+  
   # Paths to report files
   qmd_path <- glue("www/{id}.qmd")
   reportHTMLPath <- glue("{id}.html")
@@ -177,8 +185,11 @@ quartoReportServer <- function(id){
   reportQMDPath <- glue("www/download_reports/{id}-report.qmd")
   
   moduleServer(id, function(input, output, session){
-    # Reactive object to store path to execution context
-    contextRDSPath <- reactiveVal("www/context.yaml")
+    # Generate session ID if not provided
+    session_id <- paste0("session_", digest(Sys.time(), algo = "md5"))
+    
+   # Reactive object to store path to execution context
+    contextRDSPath <- reactiveVal(glue("www/context_{session_id}.yaml"))
     
     # Flag to track if report has been generated
     reportGenerated <- reactiveVal(FALSE)
@@ -209,7 +220,9 @@ quartoReportServer <- function(id){
         reportHTMLPath, 
         id,
         reportPDFPath, 
-        reportQMDPath
+        reportQMDPath,
+        session_id,
+        session_dir
       )
       reportGenerated(TRUE)
     })

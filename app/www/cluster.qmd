@@ -5,6 +5,7 @@ format:
     code-fold: true
     standalone: true
 params:
+  session_dir: "session-default"
   inputFile: "pigments.rds"
   outputFile: "clusters.rds"
   minSamplesPerCluster: 20
@@ -18,7 +19,7 @@ library("glue")
 
 ```{R}
 #| label: load data
-pigment_df <- readRDS(params$inputFile)
+pigment_df <- readRDS(file.path(params$session_dir, params$inputFile))
 # TODO: validate
 
 # TODO: set index to first column (named samples?)
@@ -40,7 +41,7 @@ result <- phytoclass::Cluster(
 ```
 
 ```{R}
-fname = params$outputFile
+fname <- file.path(params$session_dir, params$outputFile)
 saveRDS(result, file=fname)
 print(glue("cluster result saved to file {fname} on the server."))
 ```
