@@ -16,24 +16,38 @@ actualRenderReport <- function(
   
   # Save the context built using the input code
   contextRDSPath(buildContext(inputCode, output, session_id, session_dir))
-  
-  # Copy the QMD file to be used in the report
-  file.copy(qmd_path, reportQMDPath, overwrite = TRUE)
   print(glue("context: {contextRDSPath()}"))
+  
   tryCatch({
+    # Create a session-specific QMD
+    qmd_filename <- glue("{id}.qmd")
+    session_qmd_path <- file.path(session_dir, qmd_filename)
+    file.copy(qmd_path, session_qmd_path, overwrite = TRUE)
+
+    # Update HTML output path (guaranteed in session dir)
+    output_filename <- basename(reportHTMLPath)  # this is good
+    reportHTMLPath <- file.path(session_dir, output_filename)
+
     #==== Render HTML report ===========================
-    output_message <- system2(
-      command = "quarto",
-      args = c("render", qmd_path, "--execute-params", contextRDSPath(), 
-               "-P", paste0("session_dir:", session_dir)),
-      stdout = TRUE, stderr = TRUE,
-      wait = TRUE
-    )
-    
-    # Check the exit status of the command
+    withr::with_dir(session_dir, {
+      output_message <- system2(
+        command = "quarto",
+        args = c(
+          "render", 
+          basename(session_qmd_path),
+          "--output", output_filename,
+          "--execute-params", basename(contextRDSPath()),
+          "-P", "session_dir:.",              
+          "--execute-dir", "."
+        ),
+        stdout = TRUE, 
+        stderr = TRUE,
+        wait = TRUE
+      )
+    })
+
+    # Check for rendering failure
     exit_status <- attr(output_message, "status")
-    
-    # If the exit status is non-zero, treat it as an error
     if (!is.null(exit_status) && exit_status != 0) {
       stop(paste(
         "Command failed with status", exit_status, ":",
@@ -42,28 +56,39 @@ actualRenderReport <- function(
     }
     
     # === Render PDF report ============================
-    pdf_output_message <- system2(
-      command = "quarto",
-      args = c("render", qmd_path, "--to", "pdf", "--execute-params", contextRDSPath(), 
-               "--output-dir", "download_reports"),
-      stdout = TRUE, stderr = TRUE,
-      wait = TRUE
-    )
+    # In actualRenderReport function, modify the system2 calls:
+    withr::with_dir(session_dir, {
+      pdf_output_message <- system2(
+        command = "quarto",
+        args = c(
+          "render", 
+          basename(session_qmd_path),
+          "--to", "pdf", 
+          "--output", basename(reportPDFPath),
+          "--execute-params", basename(contextRDSPath()),
+          "-P", "session_dir:.",              
+          "--execute-dir", "."
+        ),
+        stdout = TRUE, 
+        stderr = TRUE
+      )
+    })
+
     
     # Copy the QMD file for download
     file.copy(qmd_path, reportQMDPath, overwrite = TRUE)
     
-    # Copy the PDF to the desired location
-    pdf_file <- sub("\\.qmd$", ".pdf", basename(qmd_path))
-    if(file.exists(pdf_file)) {
-      file.copy(pdf_file, reportPDFPath, overwrite = TRUE)
-      file.remove(pdf_file)
-    }
-    
-    # Display the rendered HTML inside an iframe
+    # === Render report inline in app (HTML iframe) ===
     output$output <- renderUI({
-      tags$iframe(src = reportHTMLPath, width = "100%", height = "800px")
+      # Use relative path from www directory
+      relative_path <- sub("^www/", "", session_dir)
+      tags$iframe(
+        src = file.path(relative_path, output_filename),
+        width = "100%", 
+        height = "800px"
+      )
     })
+
     
   }, error = function(e) {
     # Show error message in UI if rendering fails
@@ -105,7 +130,8 @@ renderReport <- function(
     contextRDSPath,
     setupInputCode,
     output,
-    qmd_path, reportHTMLPath,
+    qmd_path, 
+    reportHTMLPath,
     reportPDFPath,
     reportQMDPath,
     id, 
@@ -174,22 +200,25 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
 # === Server Logic for Quarto Report Module ==================================
 quartoReportServer <- function(id, session_dir = NULL){
   session_dir <- basename(session_dir)
+  session_path <- file.path("www", session_dir)
   
-  # Paths to report files
-  qmd_path <- glue("www/{id}.qmd")
-  reportHTMLPath <- glue("{id}.html")
-  
-  #Creating a directory to store the reports
-  dir.create("www/download_reports", showWarnings = FALSE)
-  reportPDFPath <- glue("www/download_reports/{id}.pdf") 
-  reportQMDPath <- glue("www/download_reports/{id}-report.qmd")
+  # Paths
+  qmd_path <- file.path("www", glue("{id}.qmd"))
+  reportHTMLPath <- file.path(session_path, glue("{id}.html"))
+
+  # Ensure download_reports folder exists
+  download_reports_dir <- file.path(session_path, "download_reports")
+  dir.create(download_reports_dir, showWarnings = FALSE, recursive = TRUE)
+  reportPDFPath <- file.path(session_path, glue("{id}.pdf"))
+
+  reportQMDPath <- file.path(download_reports_dir, glue("{id}-report.qmd"))
   
   moduleServer(id, function(input, output, session){
     # Generate session ID if not provided
     session_id <- paste0("session_", digest(Sys.time(), algo = "md5"))
     
    # Reactive object to store path to execution context
-    contextRDSPath <- reactiveVal(glue("www/context_{session_id}.yaml"))
+    contextRDSPath <- reactiveVal(file.path(session_path, "context.yaml"))
     
     # Flag to track if report has been generated
     reportGenerated <- reactiveVal(FALSE)
@@ -222,7 +251,7 @@ quartoReportServer <- function(id, session_dir = NULL){
         reportPDFPath, 
         reportQMDPath,
         session_id,
-        session_dir
+        session_path 
       )
       reportGenerated(TRUE)
     })

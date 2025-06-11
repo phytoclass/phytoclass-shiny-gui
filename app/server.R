@@ -55,8 +55,8 @@ server <- function(input, output, session) {
   })
   
   # === quarto reports ========================================================
-  quartoReportServer("cluster", session_dir = session_dir)
-  quartoReportServer("inspectCluster", session_dir = session_dir)
+   quartoReportServer("cluster", session_dir = session_dir)
+  quartoReportServer("inspectCluster", session_dir = session_dir) 
   quartoReportServer("anneal", session_dir = session_dir)
 
   
