@@ -2,6 +2,8 @@ library(later)
 library(glue)
 library(here)
 library(digest)
+library(withr)
+
 
 # Load function to build the context for report rendering
 source("modules/quartoReport/buildContext.R")
