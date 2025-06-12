@@ -74,7 +74,6 @@ actualRenderReport <- function(
       )
     })
 
-    
     # Copy the QMD file for download
     file.copy(qmd_path, reportQMDPath, overwrite = TRUE)
     
@@ -88,7 +87,6 @@ actualRenderReport <- function(
         height = "800px"
       )
     })
-
     
   }, error = function(e) {
     # Show error message in UI if rendering fails
@@ -196,7 +194,6 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   )))
 }
 
-
 # === Server Logic for Quarto Report Module ==================================
 quartoReportServer <- function(id, session_dir = NULL){
   session_dir <- basename(session_dir)
@@ -285,7 +282,6 @@ quartoReportServer <- function(id, session_dir = NULL){
         }
       }
     )
-    
     
     # === environment upload ================================================
     # TODO: upload context.rds

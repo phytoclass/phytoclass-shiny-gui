@@ -12,11 +12,11 @@ source("modules/quartoReport/quartoReport.R")
 # Define server logic for app ----
 server <- function(input, output, session) {
   
-  # Create unique session directory inside www
+  # Create unique session directory for each user session
   session_dir <- file.path("www", paste0("session-", session$token))
   if (!dir.exists(session_dir)) dir.create(session_dir)
   
- # Save default files in session_dir instead of www root
+  # Save default pigment and taxa files in session directory
   saveRDS(get_df_from_file("sample_data/sm.csv"), file.path(session_dir, "pigments.rds"))
   saveRDS(get_df_from_file("sample_data/taxa.csv"), file.path(session_dir, "taxa.rds"))
   
@@ -55,8 +55,13 @@ server <- function(input, output, session) {
   })
   
   # === quarto reports ========================================================
-   quartoReportServer("cluster", session_dir = session_dir)
+  # cluster selection
+  quartoReportServer("cluster", session_dir = session_dir)
+  
+  # cluster inspector
   quartoReportServer("inspectCluster", session_dir = session_dir) 
+  
+  # annealing report
   quartoReportServer("anneal", session_dir = session_dir)
 
   
@@ -83,6 +88,27 @@ server <- function(input, output, session) {
       write.csv(selected_cluster_data, file, row.names = TRUE)
     }
   )
+  
+  # ---- Session Cleanup ----
+  # Deletes session folders older than 1 hour (3600 seconds)
+  clean_old_sessions <- function(path = "www", cutoff_seconds = 3600) {
+    now <- Sys.time()
+    folders <- list.dirs(path, full.names = TRUE, recursive = FALSE)
+    for (folder in folders) {
+      if (grepl("session-", folder)) {
+        info <- file.info(folder)
+        age_seconds <- as.numeric(difftime(now, info$mtime, units = "secs"))
+        if (age_seconds > cutoff_seconds) {
+          unlink(folder, recursive = TRUE, force = TRUE)
+          log_trace("Deleted session folder: ", folder)
+        }
+      }
+    }
+  }
+  
+  # Run cleanup once when app starts
+  clean_old_sessions()
+
 }
 
 
