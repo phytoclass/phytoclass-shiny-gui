@@ -5,6 +5,7 @@ format:
     code-fold: true
     standalone: true
 params:
+  session_dir: "session-default"
   inputFile: "clusters.rds"
   selected_cluster: 1
 ---
@@ -17,7 +18,7 @@ library("glue")
 
 ```{R}
 #| label: load data
-cluster_df <- readRDS(params$inputFile)  
+cluster_df <- readRDS(file.path(params$session_dir, params$inputFile))
 
 ```
 

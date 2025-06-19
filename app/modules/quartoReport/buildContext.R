@@ -1,6 +1,8 @@
 library(yaml)
+library(digest)
+library(glue)
 
-buildContext <- function(inputCode, output){
+buildContext <- function(inputCode, output, session_id, session_dir){
   # create context file from inputs
   print("reloading environment...")
 
@@ -15,6 +17,7 @@ buildContext <- function(inputCode, output){
   var_declarations <- list()
 
   execParams <- list()
+  execParams$session_dir <- session_dir
 
   # Evaluate each expression and store variable declarations
   for (expr in expressions) {
@@ -38,15 +41,19 @@ buildContext <- function(inputCode, output){
       print(glue("error in param expression: '{expr}'"))
     }
   }
+  
   contextParams <- execParams
-  # Display the current values of exec_params in monospace
-  output$execParamsDisplay <- renderPrint({
-    contextParams
-  })
+  
+  # Render parameters in UI
+  output$execParamsDisplay <- renderPrint({ contextParams })
+  
+  # Generate hash of parameter set
+  paramString <- paste0(capture.output(str(contextParams)), collapse = "")
+  hash <- digest(paramString, algo = "sha256")
 
-  contextPath <- "www/context.yaml"  # TODO: generate better filename (with hash?)
-
-  # Save to YAML file
-  write_yaml(contextParams, contextPath)
+  # Use hashed filename
+  contextPath <- glue("www/context-{hash}.yaml")
+  write_yaml(contextParams, contextPath)  # TODO: generate better filename (with hash?)
+  
   return(contextPath)
 }

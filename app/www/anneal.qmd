@@ -5,6 +5,7 @@ format:
     code-fold: true
     standalone: true
 params:
+  session_dir: "session-default"
   inputFile: "clusters.rds"
   taxaFile: "taxa.rds"
   outputFile: "anneal.rds"
@@ -22,8 +23,8 @@ library("glue")
 ```{R}
 #| label: load data
 
-clusters <- readRDS(params$inputFile)
-taxa <- readRDS(params$taxaFile)
+clusters <- readRDS(file.path(params$session_dir, params$inputFile))
+taxa <- readRDS(file.path(params$session_dir, params$taxaFile))
 ```
 
 ```{R}

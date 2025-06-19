@@ -1,6 +1,7 @@
 # Define UI for CHEMTAX app ----
-library("glue")
-library("logger")
+library(glue)
+library(logger)
+library(digest)
 
 log_threshold(TRACE)
 
@@ -9,10 +10,15 @@ source("R/get_df_from_file.R")
 source("modules/quartoReport/quartoReport.R")
 
 # Define server logic for app ----
-server <- function(input, output) {
-  # set up default files on app open
-  saveRDS(get_df_from_file("sample_data/sm.csv"), "www/pigments.rds")
-  saveRDS(get_df_from_file("sample_data/taxa.csv"), "www/taxa.rds")
+server <- function(input, output, session) {
+  
+  # Create unique session directory for each user session
+  session_dir <- file.path("www", paste0("session-", session$token))
+  if (!dir.exists(session_dir)) dir.create(session_dir)
+  
+  # Save default pigment and taxa files in session directory
+  saveRDS(get_df_from_file("sample_data/sm.csv"), file.path(session_dir, "pigments.rds"))
+  saveRDS(get_df_from_file("sample_data/taxa.csv"), file.path(session_dir, "taxa.rds"))
   
   # Reactive value to store selected cluster
   selected_cluster <- reactiveVal(1)
@@ -35,7 +41,7 @@ server <- function(input, output) {
     # TODO: validate
     
     # TODO: generate more clever filepath
-    saveRDS(pigment_df, "www/pigments.rds")
+    saveRDS(pigment_df, file.path(session_dir, "pigments.rds"))
   })
   
   # === taxa list DF setup ===========================================
@@ -45,18 +51,19 @@ server <- function(input, output) {
     # TODO: validate
     
     # TODO: generate more clever filepath
-    saveRDS(taxalist_df, "www/taxa.rds")
+    saveRDS(taxalist_df, file.path(session_dir, "taxa.rds"))
   })
   
   # === quarto reports ========================================================
   # cluster selection
-  quartoReportServer("cluster")
+  quartoReportServer("cluster", session_dir = session_dir)
   
   # cluster inspector
-  quartoReportServer("inspectCluster")
+  quartoReportServer("inspectCluster", session_dir = session_dir) 
   
   # annealing report
-  quartoReportServer("anneal")
+  quartoReportServer("anneal", session_dir = session_dir)
+
   
   # === cluster download =================================
   output$downloadCluster <- downloadHandler(
@@ -64,8 +71,9 @@ server <- function(input, output) {
       paste0("cluster.csv")
     },
     content = function(file) {
-      req(file.exists("www/clusters.rds"))
-      cluster_df <- readRDS("www/clusters.rds")
+      cluster_path <- file.path(session_dir, "clusters.rds")
+      req(file.exists(cluster_path))
+      cluster_df <- readRDS(cluster_path)
       
       # Validate cluster exists
       req(length(cluster_df$cluster.list) >= selected_cluster())
@@ -80,6 +88,27 @@ server <- function(input, output) {
       write.csv(selected_cluster_data, file, row.names = TRUE)
     }
   )
+  
+  # ---- Session Cleanup ----
+  # Deletes session folders older than 1 hour (3600 seconds)
+  clean_old_sessions <- function(path = "www", cutoff_seconds = 3600) {
+    now <- Sys.time()
+    folders <- list.dirs(path, full.names = TRUE, recursive = FALSE)
+    for (folder in folders) {
+      if (grepl("session-", folder)) {
+        info <- file.info(folder)
+        age_seconds <- as.numeric(difftime(now, info$mtime, units = "secs"))
+        if (age_seconds > cutoff_seconds) {
+          unlink(folder, recursive = TRUE, force = TRUE)
+          log_trace("Deleted session folder: ", folder)
+        }
+      }
+    }
+  }
+  
+  # Run cleanup once when app starts
+  clean_old_sessions()
+
 }
 
 
