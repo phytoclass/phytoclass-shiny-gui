@@ -15,20 +15,24 @@ params:
 ---
 
 ```{R}
-#| code-summary: setup
+#| label: helper functions
+#| code-summary: Load required library
 
 library("glue")
 ```
 
 ```{R}
 #| label: load data
+#| code-summary: Load input cluster and taxa matrices
 
 clusters <- readRDS(file.path(params$session_dir, params$inputFile))
 taxa <- readRDS(file.path(params$session_dir, params$taxaFile))
 ```
 
 ```{R}
-#| code-summary: clean up taxa matrix if needed
+#| label: clean-taxa
+#| code-summary: Clean up taxa matrix if needed
+
 # === remove numeric rownames set by readRDS
 if (all(grepl("^[0-9]+$", rownames(taxa)))) {
   print("dropping unneeded numeric index")
@@ -57,8 +61,11 @@ if (length(dropped_colnames) > 0) {
   cat(paste(dropped_colnames, collapse = ", "), "\n")
 }
 ```
+
 ```{R}
-#| code-summary: prep S matrix
+#| label: prepare-s-matrix
+#| code-summary: Prepare S matrix
+
 if (params$selected_cluster > length(clusters$cluster.list)){
   stop("selected cluster is greater than number of clusters")
 }
@@ -71,7 +78,9 @@ selectedCluster$Clust <- NULL
 ```
 
 ```{R}
-#| code-summary: find mismatches between F and S
+#| label: validate-columns
+#| code-summary: Find mismatches between F and S
+
 # TODO: also check this for the min_max matrix
 # Assume taxa and selectedCluster are the two matrices
 headers1 <- colnames(taxa)
@@ -108,7 +117,9 @@ if (! length(common_headers) > 0){
 ```
 
 ```{R, run annealing}
-#| code-summary: run annealing
+#| label: run-annealing
+#| code-summary: Run simulated annealing
+
 set.seed(params$seed)
 
 Results <- phytoclass::simulated_annealing(
@@ -123,7 +134,9 @@ Results <- phytoclass::simulated_annealing(
 ```
 
 ```{R, show results}
+#| label: show-results
 #| code-summary: show results
+
 print(glue("
  completed w/ RMSE {Results$RMSE}
 "))

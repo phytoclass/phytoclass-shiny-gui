@@ -11,19 +11,24 @@ params:
 ---
 
 ```{R}
-#|label: helper functions
+#| label: helper functions
+#| code-summary: Load required library
 
 library("glue")
 ```
 
 ```{R}
 #| label: load data
+#| code-summary: Load selected cluster data
+
 cluster_df <- readRDS(file.path(params$session_dir, params$inputFile))
 
 ```
 
 ```{R}
-#| code-summary: show samples in cluster
+#| label: extract-cluster
+#| code-summary: Extract and clean selected cluster
+
 selectedCluster <- cluster_df$cluster.list[[
   params$selected_cluster
 ]]
@@ -34,6 +39,9 @@ print(selectedCluster)
 ```
 
 ```{R}
+#| label: cluster-histograms
+#| code-summary: Plot histograms for each pigment in cluster
+
 df <- selectedCluster
 
 library(ggplot2)
