@@ -133,6 +133,11 @@ Results <- phytoclass::simulated_annealing(
 )
 ```
 
+```{R, download taxa estimates}
+output_csv_path <- file.path(params$session_dir, "taxa_estimates.csv")
+write.csv(Results$`Class abundances`, file = output_csv_path, row.names = TRUE)
+```
+
 ```{R, show results}
 #| label: show-results
 #| code-summary: show results

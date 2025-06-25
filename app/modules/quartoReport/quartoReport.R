@@ -191,7 +191,13 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
       markdown("Use the buttons below to download results from the report."),
       # actionButton(ns("downloadRDSButton"), "download .rds"),
       downloadButton(ns("downloadPDFButton"), "Download PDF"),
-      downloadButton(ns("downloadQMDButton"), "Download QMD")
+      downloadButton(ns("downloadQMDButton"), "Download QMD"),
+      if (id == "anneal") {
+        tagList(
+          tags$hr(),
+          downloadButton(ns("downloadTaxaCSVButton"), "Download Taxa Estimates (.csv)")
+        )
+      }
     )
   )))
 }
@@ -204,6 +210,9 @@ quartoReportServer <- function(id, session_dir = NULL){
   # Paths
   qmd_path <- file.path("www", glue("{id}.qmd"))
   reportHTMLPath <- file.path(session_path, glue("{id}.html"))
+  
+  #path to taxa csv
+  taxaCSVPath <- file.path(session_path, "taxa_estimates.csv")
 
   # Ensure download_reports folder exists
   download_reports_dir <- file.path(session_path, "download_reports")
@@ -281,6 +290,20 @@ quartoReportServer <- function(id, session_dir = NULL){
           file.copy(reportQMDPath, file)
         } else {
           showNotification("QMD not found. Generate report first.", type = "error")
+        }
+      }
+    )
+    
+    output$downloadTaxaCSVButton <- downloadHandler(
+      filename = function() {
+        paste0(id, "_taxa_estimates_", Sys.Date(), ".csv")
+      },
+      content = function(file) {
+        req(reportGenerated())
+        if (file.exists(taxaCSVPath)) {
+          file.copy(taxaCSVPath, file)
+        } else {
+          showNotification("Taxa estimates file not found. Please generate the report first.", type = "error")
         }
       }
     )
