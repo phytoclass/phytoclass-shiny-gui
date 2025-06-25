@@ -5,27 +5,27 @@ library(glue)
 buildContext <- function(inputCode, output, session_id, session_dir){
   # create context file from inputs
   print("reloading environment...")
-
+  
   # Get the code from the text area input
   print(glue("inputCode: {inputCode}"))
   code <- inputCode
-
+  
   # Split the code into individual expressions
   expressions <- strsplit(code, "\n")[[1]]
-
+  
   # Initialize an empty list to store variable declarations
   var_declarations <- list()
-
+  
   execParams <- list()
   execParams$session_dir <- session_dir
-
+  
   # Evaluate each expression and store variable declarations
   for (expr in expressions) {
     # Parse the expression
     parsed_expr <- tryCatch(parse(text = expr),
                             error = function(e) glue("# invalid code '{expr}'")
     )
-
+    
     # Check if the parsed expression is an assignment
     if (
       !is.null(parsed_expr) &&
@@ -49,10 +49,8 @@ buildContext <- function(inputCode, output, session_id, session_dir){
   
   # Generate hash of parameter set
   paramString <- paste0(capture.output(str(contextParams)), collapse = "")
-  hash <- digest(paramString, algo = "sha256")
-
-  # Use hashed filename
-  contextPath <- glue("www/context-{hash}.yaml")
+  
+  contextPath <- file.path(session_dir, "context.yaml")
   write_yaml(contextParams, contextPath)  # TODO: generate better filename (with hash?)
   
   return(contextPath)

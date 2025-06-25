@@ -12,27 +12,37 @@ params:
 ---
 
 ```{R}
-#|label: helper functions
+#| label: helper functions
+#| code-summary: Load required libraries
 
-library("glue")
+suppressPackageStartupMessages({
+  library(glue)
+  library(ggdendro)
+  library(ggplot2)
+  library(plotly)
+})
 ```
 
 ```{R}
 #| label: load data
+#| code-summary: Load Input dataset 
+
 pigment_df <- readRDS(file.path(params$session_dir, params$inputFile))
 # TODO: validate
 
-# TODO: set index to first column (named samples?)
-# rownames(pigment_df) <- pigment_df[, 1]  # Use the first column as row names
-# df <- df[, -1]  # Remove the first column
-
+# Set row names if unique
+if (anyDuplicated(pigment_df[, 1]) == 0) {
+  rownames(pigment_df) <- pigment_df[, 1]
+  pigment_df <- pigment_df[, -1]
+}
 
 # Update the status based on the length of the data frame
 print(paste("Data loaded, length:", nrow(pigment_df)))
 ```
 
 ```{R}
-#|label: clustering
+#| label: clustering
+#| code-summary: Run clustering
 
 result <- phytoclass::Cluster(
   pigment_df,
@@ -41,28 +51,54 @@ result <- phytoclass::Cluster(
 ```
 
 ```{R}
+#| label: save-results
+#| code-summary: Save cluster result to file
+
 fname <- file.path(params$session_dir, params$outputFile)
 saveRDS(result, file=fname)
 print(glue("cluster result saved to file {fname} on the server."))
 ```
 
 ```{R}
-# print(result$cluster.list)
-# plot of clusters
-plot(result$cluster.plot)
+#| label: cluster-plot
+#| code-summary: Visualize the clustering result
 
-# TDOO: interactive plot?
+plot(result$cluster.plot)
 ```
 
 ```{R}
-#| code-summary: print number of clusters
+#| label: interactive-cluster-plot
+#| code-summary: Interactive cluster plot
+
+#interactive plot won't be rendered into pdf
+if (knitr::is_html_output()) {
+  dendro_data <- ggdendro::dendro_data(result$cluster.plot)
+
+# Convert hclust to dendrogram data
+dendro_data <- ggdendro::dendro_data(result$cluster.plot)
+
+# Make a ggplot dendrogram
+p <- ggplot(segment(dendro_data)) +
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) +
+  theme_minimal() +
+  labs(title = "Cluster Dendrogram")
+
+# Convert to plotly
+plotly::ggplotly(p)
+}
+```
+
+```{R}
+#| label: cluster-count
+#| code-summary: Total clusters found
+
 print(length(result$cluster.list))
 ```
 
 ```{R}
-#| code-summary: cluster table
+#| label: cluster-table
+#| code-summary: Show sample membership for clusters
 
-# TODO: print table that shows which samples are in each cluster
-#       show just one cluster (inspectCluster.qmd?)
+head(result$cluster.list[[1]])
 ```
 

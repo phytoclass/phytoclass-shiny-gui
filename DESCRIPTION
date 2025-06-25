@@ -13,6 +13,15 @@ Imports:
     phytoclass,
     glue,
     logger,
-    shiny
+    shiny,
+    ggplot2,
+    plotly,
+    ggdendro,
+    digest, 
+    withr,
+    here,
+    pander,
+    shinycssloaders,
+    yaml
 Remotes:
   phytoclass/phytoclass
