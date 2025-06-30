@@ -30,10 +30,10 @@ suppressPackageStartupMessages({
 pigment_df <- readRDS(file.path(params$session_dir, params$inputFile))
 # TODO: validate
 
-# Set row names if unique
-if (anyDuplicated(pigment_df[, 1]) == 0) {
-  rownames(pigment_df) <- pigment_df[, 1]
-  pigment_df <- pigment_df[, -1]
+# Set first column as row names if it contains sample names
+if (is.character(pigment_df[[1]])) {
+  rownames(pigment_df) <- pigment_df[[1]]
+  pigment_df <- pigment_df[, -1, drop = FALSE]
 }
 
 # Update the status based on the length of the data frame
