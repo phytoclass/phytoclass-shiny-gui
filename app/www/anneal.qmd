@@ -1,5 +1,5 @@
 ---
-title: "Cluster"
+title: "Annealing"
 format:
   html:
     code-fold: true
@@ -9,10 +9,22 @@ params:
   inputFile: "clusters.rds"
   taxaFile: "taxa.rds"
   outputFile: "anneal.rds"
-  seed: 7683
+  seed: 0
   selected_cluster: 1
   niter: 500
 ---
+
+```{r echo=FALSE, results='asis'}
+library(glue)
+cat(glue("
+- **Input File**: `{params$inputFile}`  
+- **Taxa File**: `{params$taxaFile}`  
+- **Output File**: `{params$outputFile}`  
+- **Selected Cluster**: `{params$selected_cluster}`  
+- **Niter**: `{params$niter}`  
+- **Seed**: `{params$seed}`  
+"))
+```
 
 ```{R}
 #| label: helper functions

@@ -10,6 +10,14 @@ params:
   selected_cluster: 1
 ---
 
+```{r echo=FALSE, results='asis'}
+library(glue)
+cat(glue("
+- **Input File**: `{params$inputFile}`  
+- **Selected Cluster**: `{params$selected_cluster}`  
+"))
+```
+
 ```{R}
 #| label: helper functions
 #| code-summary: Load required library

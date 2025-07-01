@@ -44,9 +44,6 @@ buildContext <- function(inputCode, output, session_id, session_dir){
   
   contextParams <- execParams
   
-  # Render parameters in UI
-  output$execParamsDisplay <- renderPrint({ contextParams })
-  
   # Generate hash of parameter set
   paramString <- paste0(capture.output(str(contextParams)), collapse = "")
   

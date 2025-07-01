@@ -11,6 +11,15 @@ params:
   minSamplesPerCluster: 20
 ---
 
+```{r echo=FALSE, results='asis'}
+library(glue)
+cat(glue("
+- **Input File**: `{params$inputFile}`  
+- **Output File**: `{params$outputFile}`  
+- **Min samples per cluster**: `{params$minSamplesPerCluster}`  
+"))
+```
+
 ```{R}
 #| label: helper functions
 #| code-summary: Load required libraries
