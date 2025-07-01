@@ -85,6 +85,10 @@ server <- function(input, output, session) {
         selected_cluster_data$Clust <- NULL
       }
       
+      # Round off numeric values to 4 decimal places
+      is_numeric_col <- sapply(selected_cluster_data, is.numeric)
+      selected_cluster_data[is_numeric_col] <- lapply(selected_cluster_data[is_numeric_col], round, digits = 4)
+      
       write.csv(selected_cluster_data, file, row.names = TRUE)
     }
   )
