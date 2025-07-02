@@ -2,7 +2,7 @@ library(yaml)
 library(digest)
 library(glue)
 
-buildContext <- function(inputCode, output, session_id, session_dir){
+buildContext <- function(inputCode, bypass_clustering, output, session_id, session_dir){
   # create context file from inputs
   print("reloading environment...")
   
@@ -42,10 +42,13 @@ buildContext <- function(inputCode, output, session_id, session_dir){
     }
   }
   
-  contextParams <- execParams
+  if (isTRUE(bypass_clustering)) {
+    execParams$inputFile <- "pigments.rds"
+  } else if (is.null(execParams$inputFile)) {
+    execParams$inputFile <- "clusters.rds"
+  }
   
-  # Render parameters in UI
-  output$execParamsDisplay <- renderPrint({ contextParams })
+  contextParams <- execParams
   
   # Generate hash of parameter set
   paramString <- paste0(capture.output(str(contextParams)), collapse = "")
