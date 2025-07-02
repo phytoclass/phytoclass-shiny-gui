@@ -1,5 +1,5 @@
 ---
-title: "Cluster"
+title: "Annealing"
 format:
   html:
     code-fold: true
@@ -9,10 +9,22 @@ params:
   inputFile: "clusters.rds"
   taxaFile: "taxa.rds"
   outputFile: "anneal.rds"
-  seed: 7683
+  seed: 0
   selected_cluster: 1
   niter: 500
 ---
+
+```{r echo=FALSE, results='asis'}
+library(glue)
+cat(glue("
+- **Input File**: `{params$inputFile}`  
+- **Taxa File**: `{params$taxaFile}`  
+- **Output File**: `{params$outputFile}`  
+- **Selected Cluster**: `{params$selected_cluster}`  
+- **Niter**: `{params$niter}`  
+- **Seed**: `{params$seed}`  
+"))
+```
 
 ```{R}
 #| label: helper functions
@@ -25,7 +37,7 @@ library("glue")
 #| label: load data
 #| code-summary: Load input cluster and taxa matrices
 
-clusters <- readRDS(file.path(params$session_dir, params$inputFile))
+input_data <- readRDS(file.path(params$session_dir, params$inputFile))
 taxa <- readRDS(file.path(params$session_dir, params$taxaFile))
 ```
 
@@ -66,15 +78,17 @@ if (length(dropped_colnames) > 0) {
 #| label: prepare-s-matrix
 #| code-summary: Prepare S matrix
 
-if (params$selected_cluster > length(clusters$cluster.list)){
-  stop("selected cluster is greater than number of clusters")
+if ("cluster.list" %in% names(input_data)) {
+  # Using clustered data
+  if (params$selected_cluster > length(input_data$cluster.list)) {
+    stop("selected cluster is greater than number of clusters")
+  }
+  selectedCluster <- input_data$cluster.list[[params$selected_cluster]]
+  selectedCluster$Clust <- NULL
+} else {
+  # Using raw pigment matrix directly
+  selectedCluster <- input_data
 }
-
-selectedCluster <- clusters$cluster.list[[
-  params$selected_cluster
-]]
-# log_trace("Remove cluster column/label")
-selectedCluster$Clust <- NULL
 ```
 
 ```{R}
@@ -124,7 +138,7 @@ set.seed(params$seed)
 
 Results <- phytoclass::simulated_annealing(
   S = selectedCluster,
-  F = taxa,  # TODO: this isn't working?
+  Fmat = taxa,  # TODO: this isn't working?
   niter = params$niter,  # number of iterations
   # user_defined_min_max = minMaxTable
   # TODO: place to upload table to replace

@@ -11,13 +11,13 @@ source("modules/quartoReport/buildContext.R")
 # === Function to actually render the report =========
 actualRenderReport <- function(
     contextRDSPath, inputCode, output, qmd_path, reportHTMLPath, reportPDFPath, 
-    reportQMDPath, id, session_id, session_dir
+    reportQMDPath, id, session_id, session_dir, bypass_clustering
 ){
   print("rendering....")
   print(glue("inputCode: {inputCode}"))
   
   # Save the context built using the input code
-  contextRDSPath(buildContext(inputCode, output, session_id, session_dir))
+  contextRDSPath(buildContext(inputCode, bypass_clustering, output, session_id, session_dir))
   print(glue("context: {contextRDSPath()}"))
   
   tryCatch({
@@ -109,7 +109,7 @@ actualRenderReport <- function(
 # === Schedules and triggers the report rendering =================================
 renderReport <- function(
     contextRDSPath, setupInputCode, output, qmd_path, reportHTMLPath, id, 
-    reportPDFPath, reportQMDPath, session_id, session_dir
+    reportPDFPath, reportQMDPath, session_id, session_dir, bypass_clustering
 ){
   # renderReport schedules the render for later so that the "generating report..." text shows immediately
   print(glue("generating report '{id}'..."))
@@ -136,7 +136,8 @@ renderReport <- function(
     reportQMDPath,
     id, 
     session_id,
-    session_dir
+    session_dir,
+    bypass_clustering
   )
 }
 
@@ -149,6 +150,12 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
     tabPanel("generate report",
     verbatimTextOutput(ns("execParamsDisplay")),
     tags$br(),
+    if (id == "anneal") tagList(
+      checkboxInput(ns("bypass_clustering"),
+        label = "Skip Clustering",
+        value = FALSE
+      )
+    ),
     actionButton(ns("generateButton"), "generate report"),
     
     # Add a loading spinner while output is rendering
@@ -259,7 +266,8 @@ quartoReportServer <- function(id, session_dir = NULL){
         reportPDFPath, 
         reportQMDPath,
         session_id,
-        session_path 
+        session_path,
+        input$bypass_clustering
       )
       reportGenerated(TRUE)
     })

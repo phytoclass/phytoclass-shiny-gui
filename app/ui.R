@@ -112,7 +112,7 @@ ui <- fluidPage(
             ),
             downloadButton("downloadCluster", "Download Inspected Cluster CSV")
           ),
-          tabPanel("Run Annealing on a Cluster",
+          tabPanel("Run Annealing",
             markdown(paste0(
               "Simulated annealing is run to solve the least squares ",
               "minimization problem to determine the most likely taxa in the ",
