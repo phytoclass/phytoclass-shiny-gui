@@ -8,6 +8,7 @@ params:
   session_dir: "session-default"
   inputFile: "clusters.rds"
   taxaFile: "taxa.rds"
+  minMaxFile: "minmax.rds"
   outputFile: "anneal.rds"
   seed: 0
   selected_cluster: 1
@@ -130,7 +131,62 @@ if (! length(common_headers) > 0){
 }
 ```
 
-```{R, run annealing}
+```{R}
+#| label: load-minmax
+#| code-summary: Load min-max table (custom or default)
+
+# Start with the default min-max table from the phytoclass package
+min_max_table <- phytoclass::min_max
+cat("Using default min-max values\n")
+
+# Construct full path to the custom min-max file (if uploaded by user)
+minmax_path <- file.path(params$session_dir, params$minMaxFile)
+
+# If a custom file exists, try to load and validate it
+if (file.exists(minmax_path)) {
+  custom_minmax <- readRDS(minmax_path)
+
+  # Standardize column names for comparison
+  colnames_clean <- tolower(trimws(colnames(custom_minmax)))
+
+  # Try to detect required columns regardless of naming variations
+  class_col   <- which(colnames_clean %in% c("class", "taxa"))
+  pigment_col <- which(colnames_clean %in% c("pigment", "pig_abbrev", "pig"))
+  min_col     <- which(colnames_clean %in% c("min", "minimum"))
+  max_col     <- which(colnames_clean %in% c("max", "maximum"))
+
+  # Ensure exactly one column for each required field is found
+  if (length(class_col) == 1 && length(pigment_col) == 1 &&
+      length(min_col) == 1 && length(max_col) == 1) {
+    
+    # Reconstruct min-max table using standardized column names
+    min_max_table <- data.frame(
+      class   = as.character(custom_minmax[[class_col]]),
+      pigment = as.character(custom_minmax[[pigment_col]]),
+      min     = as.numeric(custom_minmax[[min_col]]),
+      max     = as.numeric(custom_minmax[[max_col]]),
+      stringsAsFactors = FALSE
+    )
+
+    cat("Using custom min-max values from file\n")
+  } else {
+    # If required columns are not correctly found, fallback to default
+    cat("Custom min-max file missing required columns (class/taxa, pigment, min, max). Using defaults.\n")
+  }
+}
+
+```
+
+```{R}
+#| label: show-minmax
+#| code-summary: Preview of min-max values
+#| echo: false
+
+knitr::kable(head(min_max_table, 10), caption = "First 10 rows of Min-Max Table Used")
+
+```
+
+```{R}
 #| label: run-annealing
 #| code-summary: Run simulated annealing
 
@@ -139,15 +195,17 @@ set.seed(params$seed)
 Results <- phytoclass::simulated_annealing(
   S = selectedCluster,
   Fmat = taxa,  # TODO: this isn't working?
-  niter = params$niter,  # number of iterations
-  # user_defined_min_max = minMaxTable
-  # TODO: place to upload table to replace
-  #       phytoclass::min_max table
+  niter = params$niter,
+  user_defined_min_max = min_max_table,
   verbose = FALSE
 )
 ```
 
-```{R, download taxa estimates}
+```{R}
+#| label: download-estimate
+#| code-summary: Prepare taxa estimate csv 
+#| echo: false
+
 output_csv_path <- file.path(params$session_dir, "taxa_estimates.csv")
 write.csv(Results$`Class abundances`, file = output_csv_path, row.names = TRUE)
 ```

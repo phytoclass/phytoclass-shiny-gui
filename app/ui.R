@@ -84,6 +84,20 @@ ui <- fluidPage(
               # TODO: ability to customize - uncheck groups in the preset
               #       example removal:
               #       Sm2 <- Sm[, -4]
+            ),
+            tabPanel("Min-Max Table",
+              markdown(paste0(
+                "# Custom Min-Max Table\n",
+                "You can upload a `.csv` file to provide pigment ratio lower/upper bounds ",
+                "for each taxon-pigment pair. \n\n",
+                 "[See here for details]",
+                "(https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/F_matrix.md)",
+                sep = "\n"
+              )),
+              fileInput("minmax_file", "Upload Min-Max .csv file (optional)",
+                multiple = FALSE,
+                accept = c("text/csv", ".csv")
+              )
             )
           )
         ),
@@ -123,6 +137,7 @@ ui <- fluidPage(
               defaultSetupCode = paste(
                 "inputFile <- 'clusters.rds'",
                 "taxaFile <- 'taxa.rds'",
+                "minMaxFile <- 'minmax.rds'",
                 "outputFile <- 'annealing.rds'",
                 "seed <- 0",
                 "selected_cluster <- 1",

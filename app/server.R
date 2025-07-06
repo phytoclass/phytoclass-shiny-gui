@@ -54,6 +54,12 @@ server <- function(input, output, session) {
     saveRDS(taxalist_df, file.path(session_dir, "taxa.rds"))
   })
   
+  observeEvent(input$minmax_file, {
+    minmax_df <- get_df_from_file(input$minmax_file$datapath)
+    # TODO: validate the structure matches expected min-max format
+    saveRDS(minmax_df, file.path(session_dir, "minmax.rds"))
+  })
+  
   # === quarto reports ========================================================
   # cluster selection
   quartoReportServer("cluster", session_dir = session_dir)
