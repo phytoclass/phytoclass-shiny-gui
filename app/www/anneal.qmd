@@ -19,7 +19,8 @@ params:
 library(glue)
 cat(glue("
 - **Input File**: `{params$inputFile}`  
-- **Taxa File**: `{params$taxaFile}`  
+- **Taxa File**: `{params$taxaFile}`
+- **MinMax Table** {params$minMaxFile}
 - **Output File**: `{params$outputFile}`  
 - **Selected Cluster**: `{params$selected_cluster}`  
 - **Niter**: `{params$niter}`  
@@ -93,6 +94,17 @@ if ("cluster.list" %in% names(input_data)) {
 ```
 
 ```{R}
+#| label: restore-rownames
+#| code-summary: Restore sample names as rownames if present
+#| echo: false 
+
+if (is.character(selectedCluster[[1]]) && !anyDuplicated(selectedCluster[[1]])) {
+  rownames(selectedCluster) <- selectedCluster[[1]]
+  selectedCluster <- selectedCluster[, -1, drop = FALSE]
+}
+```
+
+```{R}
 #| label: validate-columns
 #| code-summary: Find mismatches between F and S
 
@@ -137,7 +149,6 @@ if (! length(common_headers) > 0){
 
 # Start with the default min-max table from the phytoclass package
 min_max_table <- phytoclass::min_max
-cat("Using default min-max values\n")
 
 # Construct full path to the custom min-max file (if uploaded by user)
 minmax_path <- file.path(params$session_dir, params$minMaxFile)
@@ -174,15 +185,6 @@ if (file.exists(minmax_path)) {
     cat("Custom min-max file missing required columns (class/taxa, pigment, min, max). Using defaults.\n")
   }
 }
-
-```
-
-```{R}
-#| label: show-minmax
-#| code-summary: Preview of min-max values
-#| echo: false
-
-knitr::kable(head(min_max_table, 10), caption = "First 10 rows of Min-Max Table Used")
 
 ```
 
