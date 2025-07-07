@@ -22,6 +22,7 @@ Imports:
     here,
     pander,
     shinycssloaders,
-    yaml
+    yaml,
+    rhandsontable
 Remotes:
   phytoclass/phytoclass

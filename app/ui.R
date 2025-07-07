@@ -53,8 +53,7 @@ ui <- fluidPage(
                   ".csv"
                 )
               ),
-              markdown("## File Loaded"),
-              # TODO: content section showing loaded file
+              uiOutput("pigments_table_ui")
             ),
             tabPanel("Taxa List",
               markdown(paste(
@@ -80,10 +79,11 @@ ui <- fluidPage(
                            "text/comma-separated-values,text/plain",
                            ".csv"
                 )
-              )
+              ),
               # TODO: ability to customize - uncheck groups in the preset
               #       example removal:
               #       Sm2 <- Sm[, -4]
+              uiOutput("taxa_table_ui")
             ),
             tabPanel("Min-Max Table",
               markdown(paste0(
@@ -97,7 +97,8 @@ ui <- fluidPage(
               fileInput("minmax_file", "Upload Min-Max .csv file (optional)",
                 multiple = FALSE,
                 accept = c("text/csv", ".csv")
-              )
+              ),
+              uiOutput("minmax_table_ui")
             )
           )
         ),
