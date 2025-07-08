@@ -204,6 +204,12 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
           tags$hr(),
           downloadButton(ns("downloadTaxaCSVButton"), "Download Taxa Estimates (.csv)")
         )
+      },
+      if (id == "inspectCluster") {
+        tagList(
+          tags$hr(),
+          downloadButton("downloadCluster", "Download Inspected Cluster CSV")
+        )
       }
     )
   )))

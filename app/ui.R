@@ -53,6 +53,9 @@ ui <- fluidPage(
                   ".csv"
                 )
               ),
+              actionButton("run_matrix_check_S", "Run Matrix Check", class = "btn btn-primary"),
+              verbatimTextOutput("matrix_check_output_S"),
+              br(), br(),
               uiOutput("pigments_table_ui")
             ),
             tabPanel("Taxa List",
@@ -83,6 +86,9 @@ ui <- fluidPage(
               # TODO: ability to customize - uncheck groups in the preset
               #       example removal:
               #       Sm2 <- Sm[, -4]
+              actionButton("run_matrix_check_F", "Run Matrix Check", class = "btn btn-primary"),
+              verbatimTextOutput("matrix_check_output_F"),
+              br(), br(),
               uiOutput("taxa_table_ui")
             ),
             tabPanel("Min-Max Table",
@@ -125,7 +131,6 @@ ui <- fluidPage(
             quartoReportUI("inspectCluster",
               defaultSetupCode = "selected_cluster <- 1"
             ),
-            downloadButton("downloadCluster", "Download Inspected Cluster CSV")
           ),
           tabPanel("Run Annealing",
             markdown(paste0(

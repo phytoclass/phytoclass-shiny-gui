@@ -43,6 +43,13 @@ server <- function(input, output, session) {
     # Load your data into the 'data' reactive value
     # For example, reading a CSV file:
     pigment_df <- get_df_from_file(input$pigments_file$datapath)
+    
+    # Set first column as row names if it contains character data
+    if (is.character(pigment_df[[1]])) {
+      rownames(pigment_df) <- pigment_df[[1]]
+      pigment_df <- pigment_df[, -1, drop = FALSE]
+    }
+    
     pigments_data(pigment_df)
     # TODO: validate
     
@@ -82,8 +89,14 @@ server <- function(input, output, session) {
   # When the taxa file is uploaded, read it and store it
   observeEvent(input$taxalist_file, {
     taxalist_df <- get_df_from_file(input$taxalist_file$datapath)
-     taxalist_data(taxalist_df)
-    # TODO: validate
+    
+    # Set first column as row names if it contains character data
+    if (is.character(taxalist_df[[1]])) {
+      rownames(taxalist_df) <- taxalist_df[[1]]
+      taxalist_df <- taxalist_df[, -1, drop = FALSE]
+    }
+    
+    taxalist_data(taxalist_df)
     
     # TODO: generate more clever filepath
     saveRDS(taxalist_df, file.path(session_dir, "taxa.rds"))
@@ -148,6 +161,68 @@ server <- function(input, output, session) {
     saveRDS(updated, file.path(session_dir, "minmax.rds"))
     log_trace("Min-Max edits saved.")
   })
+  
+  # === Matrix Check setup ===========================================
+  run_matrix_check <- function(S_path, F_path, output_id) {
+     # If either matrix file is missing, inform the user
+    if (!file.exists(S_path) || !file.exists(F_path)) {
+      output[[output_id]] <- renderText("Cannot check. S or F matrix missing.")
+      return()
+    }
+    
+    #Load files
+    S <- readRDS(S_path)
+    Fmat <- readRDS(F_path)
+  
+    tryCatch({
+      #Perform matrix check function on files
+      result <- phytoclass::Matrix_checks(S, Fmat)
+  
+      # Identify removed and retained columns
+      removed_S <- setdiff(colnames(S), colnames(result$Snew))
+      removed_F <- setdiff(colnames(Fmat), colnames(result$Fnew))
+      common_cols <- intersect(colnames(result$Snew), colnames(result$Fnew))
+      missing_in_S <- setdiff(colnames(result$Fnew), colnames(result$Snew))
+      missing_in_F <- setdiff(colnames(result$Snew), colnames(result$Fnew))
+  
+      # Show detailed report
+      output[[output_id]] <- renderText({
+        paste0(
+          "Matrix Check Completed\n\n",
+          "Columns that would be removed due to low values:\n",
+          "- From S matrix: ", if (length(removed_S)) paste(removed_S, collapse = ", ") else "None", "\n",
+          "- From F matrix: ", if (length(removed_F)) paste(removed_F, collapse = ", ") else "None", "\n\n",
+          "Column name alignment:\n",
+          "- Shared columns (S ∩ F): ", if (length(common_cols)) paste(common_cols, collapse = ", ") else "None", "\n",
+          "- In F but missing in S: ", if (length(missing_in_S)) paste(missing_in_S, collapse = ", ") else "None", "\n",
+          "- In S but missing in F: ", if (length(missing_in_F)) paste(missing_in_F, collapse = ", ") else "None"
+        )
+      })
+    }, error = function(e) {
+      output[[output_id]] <- renderText({
+        paste0("Matrix Check Failed:\n", e$message)
+      })
+    })
+  }
+  
+  # Pigments tab
+  observeEvent(input$run_matrix_check_S, {
+    run_matrix_check(
+      S_path = file.path(session_dir, "pigments.rds"),
+      F_path = file.path(session_dir, "taxa.rds"),
+      output_id = "matrix_check_output_S"
+    )
+  })
+  
+  # Taxa tab
+  observeEvent(input$run_matrix_check_F, {
+    run_matrix_check(
+      S_path = file.path(session_dir, "pigments.rds"),
+      F_path = file.path(session_dir, "taxa.rds"),
+      output_id = "matrix_check_output_F"
+    )
+  })
+
   
   # === quarto reports ========================================================
   # cluster selection
