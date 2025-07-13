@@ -68,3 +68,17 @@ ggplot(df_long, aes(x = Value)) +
 
 
 ```
+
+```{R}
+#| label: cluster-density
+#| code-summary: Density plots per pigment (faceted)
+
+ggplot(df_long, aes(x = Value)) +
+  geom_density(fill = "lightblue", alpha = 0.7) +
+  facet_wrap(~ Variable, scales = "free") +
+  labs(title = "Density Plots for Each Pigment",
+       x = "Value", y = "Density") +
+  theme_minimal()
+
+
+```

@@ -31,8 +31,13 @@ cat(glue("
 ```{R}
 #| label: helper functions
 #| code-summary: Load required library
+#| warning: false
+#| message: false
 
-library("glue")
+library(glue)
+library(networkD3)
+library(dplyr)
+library(pander)
 ```
 
 ```{R}
@@ -203,6 +208,87 @@ Results <- phytoclass::simulated_annealing(
 )
 ```
 
+```{R, show results}
+#| label: show-results
+#| code-summary: Show results
+
+print(glue("
+ completed w/ RMSE {Results$RMSE}
+"))
+
+print("Mean Absolute Error (MAE):")
+print(Results$MAE)
+# 
+print("F matrix:")
+print(Results$`F matrix`)
+
+pander(Results$`Class abundances`, digits = 6)
+```
+
+```{R}
+#| label: show-figure
+#| code-summary: Show figure from Results
+
+print(Results$Figure)
+```
+
+```{R}
+#| label: sankey-diagram
+#| code-summary: Sankey diagram of pigment flow into phytoplankton groups
+
+if (knitr::is_html_output()) {
+
+  # Aggregate pigment totals across samples
+  pigment_totals <- colSums(selectedCluster)
+
+  # Multiply by F matrix to allocate to classes
+  F <- Results$`F matrix`
+  common_pigments <- intersect(names(pigment_totals), colnames(F))
+
+  if (length(common_pigments) == 0) {
+    stop("No common pigments found between S and F matrix")
+  }
+
+  # Slice relevant portions
+  pigment_totals <- pigment_totals[common_pigments]
+  F <- F[, common_pigments, drop=FALSE]
+
+  # Compute pigment contribution to each phyto class
+  flow_df <- as.data.frame(as.matrix(F) %*% diag(pigment_totals))
+  flow_df$class <- rownames(F)
+
+  # Convert wide to long format: pigment -> class, weight = value
+  sankey_data <- flow_df |>
+    tidyr::pivot_longer(
+      -class, 
+      names_to = "pigment", 
+      values_to = "value"
+    ) |>
+    filter(value > 0)
+
+  # Create node and link structure
+  nodes <- unique(c(sankey_data$pigment, sankey_data$class))
+  node_df <- data.frame(name = nodes)
+
+  sankey_data$source <- match(sankey_data$pigment, node_df$name) - 1
+  sankey_data$target <- match(sankey_data$class, node_df$name) - 1
+
+  # Render
+  sankeyNetwork(
+    Links = sankey_data[, c("source", "target", "value")],
+    Nodes = node_df,
+    Source = "source",
+    Target = "target",
+    Value = "value",
+    NodeID = "name",
+    fontSize = 12,
+    nodeWidth = 30,
+    sinksRight = FALSE
+  )
+}
+
+```
+
 ```{R}
 #| label: download-estimate
 #| code-summary: Prepare taxa estimate csv 
@@ -211,24 +297,3 @@ Results <- phytoclass::simulated_annealing(
 output_csv_path <- file.path(params$session_dir, "taxa_estimates.csv")
 write.csv(Results$`Class abundances`, file = output_csv_path, row.names = TRUE)
 ```
-
-```{R, show results}
-#| label: show-results
-#| code-summary: show results
-
-print(glue("
- completed w/ RMSE {Results$RMSE}
-"))
-
-print(Results$Figure)
-
-print("Mean Absolute Error (MAE):")
-print(Results$MAE)
-# 
-print("F matrix:")
-print(Results$`F matrix`)
-
-library(pander)
-pander(Results$`Class abundances`, digits = 6)
-```
-
