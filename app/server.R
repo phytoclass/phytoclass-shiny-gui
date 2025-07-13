@@ -172,7 +172,19 @@ server <- function(input, output, session) {
     
     #Load files
     S <- readRDS(S_path)
-    Fmat <- readRDS(F_path)
+    Fmat <- tryCatch({
+      f_candidate <- readRDS(F_path)
+      if (!is.null(f_candidate) &&
+          is.data.frame(f_candidate) &&
+          all(sapply(f_candidate, is.numeric)) &&
+          ncol(f_candidate) > 0) {
+        f_candidate
+      } else {
+        phytoclass::Fm
+      }
+    }, error = function(e) {
+      phytoclass::Fm
+    })
   
     tryCatch({
       #Perform matrix check function on files
