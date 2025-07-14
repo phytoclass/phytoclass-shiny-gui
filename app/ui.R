@@ -7,7 +7,7 @@ ui <- fluidPage(
   title = "Phytoclass-App",
   # App title ----
   titlePanel(markdown(paste0(
-    "# Phytoplankton-From-Pigments GUI v0.0.2.0 \n",
+    "# Phytoplankton-From-Pigments GUI v0.0.3.0 \n",
     "This tool uses the [phytoclass R library](",
     "https://cran.r-project.org/web/packages/phytoclass/index.html",
     ") to estimate phytoplankton community composition from pigment data. \n",
@@ -17,7 +17,7 @@ ui <- fluidPage(
     "\n",
     "## Feedback \n",
     "Share your thoughts and report bugs by creating a new issue in the ",
-    "[issue tracker](https://github.com/phytoclass/phytoclass-shiny-gui/issues). \n",
+    # "[issue tracker](https://github.com/phytoclass/phytoclass-shiny-gui/issues). \n",
     "Questions about phytoclass can also be directed to `phytoclass@outlook.com`."
   ))),
 
