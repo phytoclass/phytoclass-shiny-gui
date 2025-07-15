@@ -315,7 +315,10 @@ quartoReportServer <- function(id, session_dir = NULL){
       content = function(file) {
         req(reportGenerated())
         if (file.exists(taxaCSVPath)) {
-          file.copy(taxaCSVPath, file)
+          taxa_df <- read.csv(taxaCSVPath, row.names = 1)
+          is_num <- sapply(taxa_df, is.numeric)
+          taxa_df[is_num] <- lapply(taxa_df[is_num], function(x) round(x, 4))
+          write.csv(taxa_df, file)
         } else {
           showNotification("Taxa estimates file not found. Please generate the report first.", type = "error")
         }
