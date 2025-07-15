@@ -53,6 +53,7 @@ ui <- fluidPage(
                   ".csv"
                 )
               ),
+              h5("Run matrix check against default F matrix"),
               actionButton("run_matrix_check_S", "Run Matrix Check", class = "btn btn-primary"),
               verbatimTextOutput("matrix_check_output_S"),
               br(), br(),
@@ -86,6 +87,7 @@ ui <- fluidPage(
               # TODO: ability to customize - uncheck groups in the preset
               #       example removal:
               #       Sm2 <- Sm[, -4]
+              h5("Run matrix check against custom uploaded F matrix"),
               actionButton("run_matrix_check_F", "Run Matrix Check", class = "btn btn-primary"),
               verbatimTextOutput("matrix_check_output_F"),
               br(), br(),

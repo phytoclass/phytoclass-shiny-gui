@@ -164,27 +164,24 @@ server <- function(input, output, session) {
   
   # === Matrix Check setup ===========================================
   run_matrix_check <- function(S_path, F_path, output_id) {
-     # If either matrix file is missing, inform the user
-    if (!file.exists(S_path) || !file.exists(F_path)) {
-      output[[output_id]] <- renderText("Cannot check. S or F matrix missing.")
+    # If either matrix file is missing, inform the user
+    if (!file.exists(S_path)) {
+      output[[output_id]] <- renderText("Cannot check. S matrix missing.")
       return()
     }
     
-    #Load files
+    #Load file
     S <- readRDS(S_path)
-    Fmat <- tryCatch({
-      f_candidate <- readRDS(F_path)
-      if (!is.null(f_candidate) &&
-          is.data.frame(f_candidate) &&
-          all(sapply(f_candidate, is.numeric)) &&
-          ncol(f_candidate) > 0) {
-        f_candidate
-      } else {
-        phytoclass::Fm
+    # Load F matrix (can be object or path)
+    Fmat <- if (is.character(F_path)) {
+      if (!file.exists(F_path)) {
+        output[[output_id]] <- renderText("Cannot check. F matrix missing.")
+        return()
       }
-    }, error = function(e) {
-      phytoclass::Fm
-    })
+      readRDS(F_path)
+    } else {
+      F_path
+    }
   
     tryCatch({
       #Perform matrix check function on files
@@ -221,7 +218,7 @@ server <- function(input, output, session) {
   observeEvent(input$run_matrix_check_S, {
     run_matrix_check(
       S_path = file.path(session_dir, "pigments.rds"),
-      F_path = file.path(session_dir, "taxa.rds"),
+      F_path = phytoclass::Fm,
       output_id = "matrix_check_output_S"
     )
   })
