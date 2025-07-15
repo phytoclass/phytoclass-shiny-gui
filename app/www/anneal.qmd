@@ -299,3 +299,13 @@ if (knitr::is_html_output()) {
 output_csv_path <- file.path(params$session_dir, "taxa_estimates.csv")
 write.csv(Results$`Class abundances`, file = output_csv_path, row.names = TRUE)
 ```
+
+```{R}
+#| label: download-fmatrix
+#| code-summary: Prepare output F matrix for download
+#| echo: false
+
+fmatrix_csv_path <- file.path(params$session_dir, "fmatrix.csv")
+write.csv(Results$`F matrix`, file = fmatrix_csv_path, row.names = TRUE)
+
+```

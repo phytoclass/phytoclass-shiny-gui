@@ -202,7 +202,8 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
       if (id == "anneal") {
         tagList(
           tags$hr(),
-          downloadButton(ns("downloadTaxaCSVButton"), "Download Taxa Estimates (.csv)")
+          downloadButton(ns("downloadTaxaCSVButton"), "Download Taxa Estimates (.csv)"),
+          downloadButton(ns("downloadFMatrixCSVButton"), "Download F Matrix (.csv)")
         )
       },
       if (id == "inspectCluster") {
@@ -226,6 +227,9 @@ quartoReportServer <- function(id, session_dir = NULL){
   
   #path to taxa csv
   taxaCSVPath <- file.path(session_path, "taxa_estimates.csv")
+  
+  #path to Fmatrix csv
+  fmatrixCSVPath <- file.path(session_path, "fmatrix.csv")
 
   # Ensure download_reports folder exists
   download_reports_dir <- file.path(session_path, "download_reports")
@@ -324,6 +328,21 @@ quartoReportServer <- function(id, session_dir = NULL){
         }
       }
     )
+    
+    output$downloadFMatrixCSVButton <- downloadHandler(
+      filename = function() {
+        paste0(id, "_fmatrix_", Sys.Date(), ".csv")
+      },
+      content = function(file) {
+        req(reportGenerated())
+        if (file.exists(fmatrixCSVPath)) {
+          file.copy(fmatrixCSVPath, file)
+        } else {
+          showNotification("F matrix file not found. Please generate the report first.", type = "error")
+        }
+      }
+    )
+
     
     # === environment upload ================================================
     # TODO: upload context.rds
