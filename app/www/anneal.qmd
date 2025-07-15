@@ -254,7 +254,9 @@ if (knitr::is_html_output()) {
   F <- F[, common_pigments, drop=FALSE]
 
   # Compute pigment contribution to each phyto class
-  flow_df <- as.data.frame(as.matrix(F) %*% diag(pigment_totals))
+  flow_matrix <- as.matrix(F) %*% diag(pigment_totals)
+  colnames(flow_matrix) <- names(pigment_totals)
+  flow_df <- as.data.frame(flow_matrix)
   flow_df$class <- rownames(F)
 
   # Convert wide to long format: pigment -> class, weight = value
