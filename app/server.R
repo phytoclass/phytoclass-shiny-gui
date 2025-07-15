@@ -2,6 +2,7 @@
 library(glue)
 library(logger)
 library(digest)
+library(rhandsontable)
 
 log_threshold(TRACE)
 
@@ -33,26 +34,207 @@ server <- function(input, output, session) {
   
   
   # === pigments DF setup ============================================
+  # Holds the uploaded pigment data in reactive memory
+  pigments_data <- reactiveVal(NULL)
+  
+  # When the pigment file is uploaded, read it, store it, and save to session directory
   observeEvent(input$pigments_file, {
     log_trace("pigment file changed")
     # Load your data into the 'data' reactive value
     # For example, reading a CSV file:
     pigment_df <- get_df_from_file(input$pigments_file$datapath)
+    
+    # Set first column as row names if it contains character data
+    if (is.character(pigment_df[[1]])) {
+      rownames(pigment_df) <- pigment_df[[1]]
+      pigment_df <- pigment_df[, -1, drop = FALSE]
+    }
+    
+    pigments_data(pigment_df)
     # TODO: validate
     
     # TODO: generate more clever filepath
     saveRDS(pigment_df, file.path(session_dir, "pigments.rds"))
   })
   
+  # UI output: Render pigment table and save button (only when file is uploaded)
+  output$pigments_table_ui <- renderUI({
+    req(pigments_data())
+    tagList(
+      h5("Pigment matrix loaded and editable below:"),
+      rHandsontableOutput("pigments_table"),
+      actionButton("save_pigments_edits", "Save Edits")
+    )
+  })
+  
+  # Render the editable handsontable for pigments
+  output$pigments_table <- renderRHandsontable({
+    req(pigments_data())
+    rhandsontable(pigments_data(), useTypes = TRUE, stretchH = "all")
+  })
+  
+  # When the save button is clicked, capture the edited table and save to session
+  observeEvent(input$save_pigments_edits, {
+    updated <- hot_to_r(input$pigments_table)
+    pigments_data(updated)
+    saveRDS(updated, file.path(session_dir, "pigments.rds"))
+    log_trace("Pigment edits saved.")
+  })
+  
   # === taxa list DF setup ===========================================
+  # Holds the uploaded taxa list data in reactive memory
+  taxalist_data <- reactiveVal(NULL)
   output$taxalistFileStatusText <- renderText({taxalistFileStatus()})
+  
+  # When the taxa file is uploaded, read it and store it
   observeEvent(input$taxalist_file, {
     taxalist_df <- get_df_from_file(input$taxalist_file$datapath)
-    # TODO: validate
+    
+    # Set first column as row names if it contains character data
+    if (is.character(taxalist_df[[1]])) {
+      rownames(taxalist_df) <- taxalist_df[[1]]
+      taxalist_df <- taxalist_df[, -1, drop = FALSE]
+    }
+    
+    taxalist_data(taxalist_df)
     
     # TODO: generate more clever filepath
     saveRDS(taxalist_df, file.path(session_dir, "taxa.rds"))
   })
+  
+  # UI output: Render taxa table and save button (only when file is uploaded)
+  output$taxa_table_ui <- renderUI({
+    req(taxalist_data())
+    tagList(
+      h5("Taxa list loaded and editable below:"),
+      rHandsontableOutput("taxa_table"),
+      actionButton("save_taxa_edits", "Save Edits")
+    )
+  })
+  
+  # Render the editable handsontable for taxa list
+  output$taxa_table <- renderRHandsontable({
+    req(taxalist_data())
+    rhandsontable(taxalist_data(), useTypes = TRUE, stretchH = "all")
+  })
+  
+  # Save edited taxa data to session when user clicks "Save Edits"
+  observeEvent(input$save_taxa_edits, {
+    updated <- hot_to_r(input$taxa_table)
+    taxalist_data(updated)
+    saveRDS(updated, file.path(session_dir, "taxa.rds"))
+    log_trace("Taxa list edits saved.")
+  })
+  
+  # === MinMax table setup ===========================================
+  
+  # Holds the uploaded min-max table in reactive memory
+  minmax_data <- reactiveVal(NULL)
+  # When the min-max file is uploaded, read and store it
+  observeEvent(input$minmax_file, {
+    minmax_df <- get_df_from_file(input$minmax_file$datapath)
+    minmax_data(minmax_df)
+    # TODO: validate the structure matches expected min-max format
+    saveRDS(minmax_df, file.path(session_dir, "minmax.rds"))
+  })
+  
+  # UI output: Render min-max table and save button (only when file is uploaded)
+  output$minmax_table_ui <- renderUI({
+    req(minmax_data())
+    tagList(
+      h5("Min-Max table loaded and editable below:"),
+      rHandsontableOutput("minmax_table"),
+      actionButton("save_minmax_edits", "Save Edits")
+    )
+  })
+  
+  # Render the editable handsontable for min-max table
+  output$minmax_table <- renderRHandsontable({
+    req(minmax_data())
+    rhandsontable(minmax_data(), useTypes = TRUE, stretchH = "all")
+  })
+  
+  # Save edited min-max data to session when user clicks "Save Edits"
+  observeEvent(input$save_minmax_edits, {
+    updated <- hot_to_r(input$minmax_table)
+    minmax_data(updated)
+    saveRDS(updated, file.path(session_dir, "minmax.rds"))
+    log_trace("Min-Max edits saved.")
+  })
+  
+  # === Matrix Check setup ===========================================
+  run_matrix_check <- function(S_path, F_path, output_id) {
+     # If either matrix file is missing, inform the user
+    if (!file.exists(S_path) || !file.exists(F_path)) {
+      output[[output_id]] <- renderText("Cannot check. S or F matrix missing.")
+      return()
+    }
+    
+    #Load files
+    S <- readRDS(S_path)
+    Fmat <- tryCatch({
+      f_candidate <- readRDS(F_path)
+      if (!is.null(f_candidate) &&
+          is.data.frame(f_candidate) &&
+          all(sapply(f_candidate, is.numeric)) &&
+          ncol(f_candidate) > 0) {
+        f_candidate
+      } else {
+        phytoclass::Fm
+      }
+    }, error = function(e) {
+      phytoclass::Fm
+    })
+  
+    tryCatch({
+      #Perform matrix check function on files
+      result <- phytoclass::Matrix_checks(S, Fmat)
+  
+      # Identify removed and retained columns
+      removed_S <- setdiff(colnames(S), colnames(result$Snew))
+      removed_F <- setdiff(colnames(Fmat), colnames(result$Fnew))
+      common_cols <- intersect(colnames(result$Snew), colnames(result$Fnew))
+      missing_in_S <- setdiff(colnames(result$Fnew), colnames(result$Snew))
+      missing_in_F <- setdiff(colnames(result$Snew), colnames(result$Fnew))
+  
+      # Show detailed report
+      output[[output_id]] <- renderText({
+        paste0(
+          "Matrix Check Completed\n\n",
+          "Columns that would be removed due to low values:\n",
+          "- From S matrix: ", if (length(removed_S)) paste(removed_S, collapse = ", ") else "None", "\n",
+          "- From F matrix: ", if (length(removed_F)) paste(removed_F, collapse = ", ") else "None", "\n\n",
+          "Column name alignment:\n",
+          "- Shared columns (S ∩ F): ", if (length(common_cols)) paste(common_cols, collapse = ", ") else "None", "\n",
+          "- In F but missing in S: ", if (length(missing_in_S)) paste(missing_in_S, collapse = ", ") else "None", "\n",
+          "- In S but missing in F: ", if (length(missing_in_F)) paste(missing_in_F, collapse = ", ") else "None"
+        )
+      })
+    }, error = function(e) {
+      output[[output_id]] <- renderText({
+        paste0("Matrix Check Failed:\n", e$message)
+      })
+    })
+  }
+  
+  # Pigments tab
+  observeEvent(input$run_matrix_check_S, {
+    run_matrix_check(
+      S_path = file.path(session_dir, "pigments.rds"),
+      F_path = file.path(session_dir, "taxa.rds"),
+      output_id = "matrix_check_output_S"
+    )
+  })
+  
+  # Taxa tab
+  observeEvent(input$run_matrix_check_F, {
+    run_matrix_check(
+      S_path = file.path(session_dir, "pigments.rds"),
+      F_path = file.path(session_dir, "taxa.rds"),
+      output_id = "matrix_check_output_F"
+    )
+  })
+
   
   # === quarto reports ========================================================
   # cluster selection

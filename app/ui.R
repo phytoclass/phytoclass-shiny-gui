@@ -7,7 +7,7 @@ ui <- fluidPage(
   title = "Phytoclass-App",
   # App title ----
   titlePanel(markdown(paste0(
-    "# Phytoplankton-From-Pigments GUI v0.0.2.0 \n",
+    "# Phytoplankton-From-Pigments GUI v0.0.3.0 \n",
     "This tool uses the [phytoclass R library](",
     "https://cran.r-project.org/web/packages/phytoclass/index.html",
     ") to estimate phytoplankton community composition from pigment data. \n",
@@ -17,7 +17,7 @@ ui <- fluidPage(
     "\n",
     "## Feedback \n",
     "Share your thoughts and report bugs by creating a new issue in the ",
-    "[issue tracker](https://github.com/phytoclass/phytoclass-shiny-gui/issues). \n",
+    # "[issue tracker](https://github.com/phytoclass/phytoclass-shiny-gui/issues). \n",
     "Questions about phytoclass can also be directed to `phytoclass@outlook.com`."
   ))),
 
@@ -53,8 +53,10 @@ ui <- fluidPage(
                   ".csv"
                 )
               ),
-              markdown("## File Loaded"),
-              # TODO: content section showing loaded file
+              actionButton("run_matrix_check_S", "Run Matrix Check", class = "btn btn-primary"),
+              verbatimTextOutput("matrix_check_output_S"),
+              br(), br(),
+              uiOutput("pigments_table_ui")
             ),
             tabPanel("Taxa List",
               markdown(paste(
@@ -80,10 +82,29 @@ ui <- fluidPage(
                            "text/comma-separated-values,text/plain",
                            ".csv"
                 )
-              )
+              ),
               # TODO: ability to customize - uncheck groups in the preset
               #       example removal:
               #       Sm2 <- Sm[, -4]
+              actionButton("run_matrix_check_F", "Run Matrix Check", class = "btn btn-primary"),
+              verbatimTextOutput("matrix_check_output_F"),
+              br(), br(),
+              uiOutput("taxa_table_ui")
+            ),
+            tabPanel("Min-Max Table",
+              markdown(paste0(
+                "# Custom Min-Max Table\n",
+                "You can upload a `.csv` file to provide pigment ratio lower/upper bounds ",
+                "for each taxon-pigment pair. \n\n",
+                 "[See here for details]",
+                "(https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/F_matrix.md)",
+                sep = "\n"
+              )),
+              fileInput("minmax_file", "Upload Min-Max .csv file (optional)",
+                multiple = FALSE,
+                accept = c("text/csv", ".csv")
+              ),
+              uiOutput("minmax_table_ui")
             )
           )
         ),
@@ -110,7 +131,6 @@ ui <- fluidPage(
             quartoReportUI("inspectCluster",
               defaultSetupCode = "selected_cluster <- 1"
             ),
-            downloadButton("downloadCluster", "Download Inspected Cluster CSV")
           ),
           tabPanel("Run Annealing",
             markdown(paste0(
@@ -123,6 +143,7 @@ ui <- fluidPage(
               defaultSetupCode = paste(
                 "inputFile <- 'clusters.rds'",
                 "taxaFile <- 'taxa.rds'",
+                "minMaxFile <- 'minmax.rds'",
                 "outputFile <- 'annealing.rds'",
                 "seed <- 0",
                 "selected_cluster <- 1",
