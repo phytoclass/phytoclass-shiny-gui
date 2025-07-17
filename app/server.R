@@ -63,7 +63,15 @@ server <- function(input, output, session) {
     tagList(
       h5("Pigment matrix loaded and editable below:"),
       rHandsontableOutput("pigments_table"),
-      actionButton("save_pigments_edits", "Save Edits")
+      div(
+        style = "margin-top: 15px; margin-bottom: 15px;",
+        actionButton(
+          "save_pigments_edits",
+          label = HTML("<b>Save Edits</b>"),
+          class = "btn btn-primary",
+          style = "font-size: 16px; padding: 10px 20px;"
+        )
+      )
     )
   })
   
@@ -108,7 +116,15 @@ server <- function(input, output, session) {
     tagList(
       h5("Taxa list loaded and editable below:"),
       rHandsontableOutput("taxa_table"),
-      actionButton("save_taxa_edits", "Save Edits")
+      div(
+        style = "margin-top: 15px; margin-bottom: 15px;",
+        actionButton(
+          "save_taxa_edits",
+          label = HTML("<b>Save Edits</b>"),
+          class = "btn btn-primary",
+          style = "font-size: 16px; padding: 10px 20px;"
+        )
+      )
     )
   })
   
@@ -144,7 +160,15 @@ server <- function(input, output, session) {
     tagList(
       h5("Min-Max table loaded and editable below:"),
       rHandsontableOutput("minmax_table"),
-      actionButton("save_minmax_edits", "Save Edits")
+      div(
+        style = "margin-top: 15px; margin-bottom: 15px;",
+        actionButton(
+          "save_minmax_edits",
+          label = HTML("<b>Save Edits</b>"),
+          class = "btn btn-primary",
+          style = "font-size: 16px; padding: 10px 20px;"
+        )
+      )
     )
   })
   
