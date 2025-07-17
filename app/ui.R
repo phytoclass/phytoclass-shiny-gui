@@ -157,5 +157,14 @@ ui <- fluidPage(
         ),
       width = 10
       )
+    ),
+    tags$div(
+      style = "
+        position: fixed;
+        bottom: 10px;
+        right: 15px;
+        font-size: 16px;
+        z-index: 9999;",
+      "Phytoclass v2.0.0"
     )
 )
