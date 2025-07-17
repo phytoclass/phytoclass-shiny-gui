@@ -203,7 +203,8 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
         tagList(
           tags$hr(),
           downloadButton(ns("downloadTaxaCSVButton"), "Download Taxa Estimates (.csv)"),
-          downloadButton(ns("downloadFMatrixCSVButton"), "Download F Matrix (.csv)")
+          downloadButton(ns("downloadFMatrixCSVButton"), "Download F Matrix (.csv)"),
+          downloadButton(ns("downloadMAECSVButton"), "Download MAE (.csv)")
         )
       },
       if (id == "inspectCluster") {
@@ -230,6 +231,9 @@ quartoReportServer <- function(id, session_dir = NULL){
   
   #path to Fmatrix csv
   fmatrixCSVPath <- file.path(session_path, "fmatrix.csv")
+  
+  #path to MAE csv
+  MAECSVPath <- file.path(session_path, "MAE.csv")
 
   # Ensure download_reports folder exists
   download_reports_dir <- file.path(session_path, "download_reports")
@@ -339,6 +343,20 @@ quartoReportServer <- function(id, session_dir = NULL){
           file.copy(fmatrixCSVPath, file)
         } else {
           showNotification("F matrix file not found. Please generate the report first.", type = "error")
+        }
+      }
+    )
+    
+    output$downloadMAECSVButton <- downloadHandler(
+      filename = function() {
+        paste0(id, "_MAE_", Sys.Date(), ".csv")
+      },
+      content = function(file) {
+        req(reportGenerated())
+        if (file.exists(MAECSVPath)) {
+          file.copy(MAECSVPath, file)
+        } else {
+          showNotification("MAE file not found. Please generate the report first.", type = "error")
         }
       }
     )

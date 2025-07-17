@@ -307,5 +307,13 @@ write.csv(Results$`Class abundances`, file = output_csv_path, row.names = TRUE)
 
 fmatrix_csv_path <- file.path(params$session_dir, "fmatrix.csv")
 write.csv(Results$`F matrix`, file = fmatrix_csv_path, row.names = TRUE)
+```
 
+```{R}
+#| label: download-MAE
+#| code-summary: Prepare output MAE for download
+#| echo: false
+
+MAE_csv_path <- file.path(params$session_dir, "MAE.csv")
+write.csv(Results$MAE, file = MAE_csv_path, row.names = TRUE)
 ```
