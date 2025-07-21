@@ -1,6 +1,6 @@
 Package: phytoclass.shiny.gui
 Title: What the Package Does (One Line, Title Case)
-Version: 0.0.3.0
+Version: 0.0.3.1
 Authors@R: 
     person("Tylar", "murray", , "murray.tylar@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8241-1919"))
@@ -10,19 +10,20 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports: 
-    phytoclass,
-    glue,
-    logger,
-    shiny,
-    ggplot2,
-    plotly,
+    digest,
     ggdendro,
-    digest, 
-    withr,
+    ggplot2,
+    glue,
     here,
+    logger,
     pander,
+    phytoclass,
+    plotly,
+    rhandsontable,
+    shiny,
     shinycssloaders,
-    yaml,
-    rhandsontable
+    tinytex,
+    withr,
+    yaml
 Remotes:
   phytoclass/phytoclass

@@ -42,7 +42,7 @@ ui <- fluidPage(
               markdown(paste0(
                 "# Pigment Sample Matrix (S Matrix)\n",
                 "Select a pigment concentrations file to supply the ",
-                "`Sample Matrix` (aka `S matrix`) of pigment samples. \n",
+                "`Sample Matrix` (aka `S matrix`) of pigment samples. \n\n",
                 "[See here for details]",
                 "(https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/pigment_matrix.md)"
               )),
@@ -53,20 +53,18 @@ ui <- fluidPage(
                   ".csv"
                 )
               ),
+              h5("Run matrix check against default F matrix"),
               actionButton("run_matrix_check_S", "Run Matrix Check", class = "btn btn-primary"),
               verbatimTextOutput("matrix_check_output_S"),
               br(), br(),
               uiOutput("pigments_table_ui")
             ),
             tabPanel("Taxa List",
-              markdown(paste(
-                "# Taxa list (F Matrix)",
-                'Select "taxa expected in the sample file ',
-                "to supply the ",
-                "`F Matrix` of pigment-taxa contributions. \n",
-                "[See here for details]",
-                "(https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/F_matrix.md)",
-                sep = "\n"
+              markdown(paste0(
+                "# Taxa list (F Matrix)\n",
+                "Select taxa expected in the sample file to supply the ",
+                "`F Matrix` of pigment-taxa contributions. \n\n",
+                "[See here for details](https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/taxa_matrix.md)"
               )),
               # TODO: OPTIONAL section
               # csv upload to customize ratios and|or add rows to userMinMax
@@ -86,6 +84,7 @@ ui <- fluidPage(
               # TODO: ability to customize - uncheck groups in the preset
               #       example removal:
               #       Sm2 <- Sm[, -4]
+              h5("Run matrix check against custom uploaded F matrix"),
               actionButton("run_matrix_check_F", "Run Matrix Check", class = "btn btn-primary"),
               verbatimTextOutput("matrix_check_output_F"),
               br(), br(),
@@ -96,8 +95,8 @@ ui <- fluidPage(
                 "# Custom Min-Max Table\n",
                 "You can upload a `.csv` file to provide pigment ratio lower/upper bounds ",
                 "for each taxon-pigment pair. \n\n",
-                 "[See here for details]",
-                "(https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/F_matrix.md)",
+                "[See here for details]",
+                "(https://github.com/USF-IMARS/chemtax-shiny-gui/blob/main/rmd/minmax_matrix.md)",
                 sep = "\n"
               )),
               fileInput("minmax_file", "Upload Min-Max .csv file (optional)",
@@ -155,5 +154,14 @@ ui <- fluidPage(
         ),
       width = 10
       )
+    ),
+    tags$div(
+      style = "
+        position: fixed;
+        bottom: 10px;
+        right: 15px;
+        font-size: 16px;
+        z-index: 9999;",
+      "Phytoclass v2.0.0"
     )
 )
