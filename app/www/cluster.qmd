@@ -2,6 +2,7 @@
 title: "Cluster"
 format:
   html:
+    self-contained: true
     code-fold: true
     standalone: true
 params:
@@ -75,9 +76,7 @@ plot(result$cluster.plot)
 #| label: interactive-cluster-plot
 #| code-summary: Interactive cluster plot
 
-#interactive plot won't be rendered into pdf
-if (knitr::is_html_output()) {
-  dendro_data <- ggdendro::dendro_data(result$cluster.plot)
+dendro_data <- ggdendro::dendro_data(result$cluster.plot)
 
 # Convert hclust to dendrogram data
 dendro_data <- ggdendro::dendro_data(result$cluster.plot)
@@ -90,7 +89,6 @@ p <- ggplot(segment(dendro_data)) +
 
 # Convert to plotly
 plotly::ggplotly(p)
-}
 ```
 
 ```{R}

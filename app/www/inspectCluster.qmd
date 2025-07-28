@@ -2,6 +2,7 @@
 title: "Cluster Inspector"
 format:
   html:
+    self-contained: true
     code-fold: true
     standalone: true
 params:
