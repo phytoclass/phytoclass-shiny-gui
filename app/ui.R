@@ -116,9 +116,9 @@ ui <- fluidPage(
             )),
             quartoReportUI("cluster",
               defaultSetupCode = paste(
-                "inputFile <- 'pigments.rds'",
-                "outputFile <- 'clusters.rds'",
-                "minSamplesPerCluster <- 14",
+                "inputFile <- 'pigments.rds'  # path to the pigment sample data",
+                "outputFile <- 'clusters.rds'  # where clustering results will be saved",
+                "minSamplesPerCluster <- 14  # minimum samples needed to form a cluster",
                 sep="\n"
                 )
             )
@@ -129,7 +129,7 @@ ui <- fluidPage(
               "Details about the selected cluster are shown here."
             )),
             quartoReportUI("inspectCluster",
-              defaultSetupCode = "selected_cluster <- 1"
+              defaultSetupCode = "selected_cluster <- 1  #Cluster to view"
             ),
           ),
           tabPanel("Run Annealing",
@@ -141,13 +141,13 @@ ui <- fluidPage(
             quartoReportUI("anneal",
               # TODO: fill these to match .qmd
               defaultSetupCode = paste(
-                "inputFile <- 'clusters.rds'",
-                "taxaFile <- 'taxa.rds'",
-                "minMaxFile <- 'minmax.rds'",
-                "outputFile <- 'annealing.rds'",
-                "seed <- 0",
-                "selected_cluster <- 1",
-                "niter <- 500",
+                "inputFile <- 'clusters.rds'  # clustering results from Clustering Tab",
+                "taxaFile <- 'taxa.rds'  # taxa list (F matrix) for the analysis",
+                "minMaxFile <- 'minmax.rds'  # optional min-max pigment ratio bounds",
+                "outputFile <- 'annealing.rds'   # where annealing results are saved",
+                "seed <- 0  # random seed for reproducibility",
+                "selected_cluster <- 1  # which cluster to analyze",
+                "niter <- 500  # number of iterations; higher = slower but more accurate",
                 sep="\n"
               )
             )
