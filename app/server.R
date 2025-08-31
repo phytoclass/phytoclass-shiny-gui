@@ -90,8 +90,8 @@ server <- function(input, output, session) {
   })
 
   # === taxa list DF setup ===========================================
-  # Holds the uploaded taxa list data in reactive memory
-  taxalist_data <- reactiveVal(NULL)
+  # Initialize with default taxa list
+  taxalist_data <- reactiveVal(phytoclass::Fm)
   output$taxalistFileStatusText <- renderText({taxalistFileStatus()})
 
   # When the taxa file is uploaded, read it and store it
@@ -110,11 +110,10 @@ server <- function(input, output, session) {
     saveRDS(taxalist_df, file.path(session_dir, "taxa.rds"))
   })
 
-  # UI output: Render taxa table and save button (only when file is uploaded)
+  # UI output: Always render taxa table and save button
   output$taxa_table_ui <- renderUI({
-    req(taxalist_data())
     tagList(
-      h5("Taxa list loaded and editable below:"),
+      h5("Taxa list (editable):"),
       rHandsontableOutput("taxa_table"),
       div(
         style = "margin-top: 15px; margin-bottom: 15px;",
@@ -144,8 +143,9 @@ server <- function(input, output, session) {
 
   # === MinMax table setup ===========================================
 
-  # Holds the uploaded min-max table in reactive memory
-  minmax_data <- reactiveVal(NULL)
+  # Initialize with default min-max table
+  minmax_data <- reactiveVal(phytoclass::min_max)
+  
   # When the min-max file is uploaded, read and store it
   observeEvent(input$minmax_file, {
     minmax_df <- get_df_from_file(input$minmax_file$datapath)
@@ -154,11 +154,10 @@ server <- function(input, output, session) {
     saveRDS(minmax_df, file.path(session_dir, "minmax.rds"))
   })
 
-  # UI output: Render min-max table and save button (only when file is uploaded)
+  # Always render the UI (default or uploaded)
   output$minmax_table_ui <- renderUI({
-    req(minmax_data())
     tagList(
-      h5("Min-Max table loaded and editable below:"),
+      h5("Min-Max table (editable):"),
       rHandsontableOutput("minmax_table"),
       div(
         style = "margin-top: 15px; margin-bottom: 15px;",
@@ -171,13 +170,13 @@ server <- function(input, output, session) {
       )
     )
   })
-
+  
   # Render the editable handsontable for min-max table
   output$minmax_table <- renderRHandsontable({
     req(minmax_data())
     rhandsontable(minmax_data(), useTypes = TRUE, stretchH = "all")
   })
-
+  
   # Save edited min-max data to session when user clicks "Save Edits"
   observeEvent(input$save_minmax_edits, {
     updated <- hot_to_r(input$minmax_table)

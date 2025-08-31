@@ -73,7 +73,7 @@ ui <- fluidPage(
               # `Ratio Matrix` (aka `F matrix`) is the ratio of pigments
               #       relative to chlorophyll a.
               # TODO: select preset dropdown (region)
-              selectInput("taxaPreset", "Taxa Preset", list("all")),#, "antarctic")),
+              selectInput("taxaPreset", "Taxa Preset", list("Default")),#, "antarctic")),
               # TODO: or custom preset upload
               fileInput("taxalist_file", "List of taxa .csv file.",
                 multiple = FALSE,
