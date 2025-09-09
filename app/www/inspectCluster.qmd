@@ -65,21 +65,8 @@ df_long <- pivot_longer(df, cols = everything(),
 ggplot(df_long, aes(x = Value)) +
   geom_histogram(bins = 30, fill = "skyblue", color = "black") +
   facet_wrap(~ Variable, scales = "free_x") +
-  labs(title = "Histograms for Each Column", x = "Value", y = "Frequency")
-
-
-```
-
-```{R}
-#| label: cluster-density
-#| code-summary: Density plots per pigment (faceted)
-
-ggplot(df_long, aes(x = Value)) +
-  geom_density(fill = "lightblue", alpha = 0.7) +
-  facet_wrap(~ Variable, scales = "free") +
-  labs(title = "Density Plots for Each Pigment",
-       x = "Value", y = "Density") +
-  theme_minimal()
+  labs(title = "Histograms for Each Column", x = "Value", y = "Frequency") +
+  theme_bw()
 
 
 ```

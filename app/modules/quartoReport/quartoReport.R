@@ -125,37 +125,9 @@ renderReport <- function(
 quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   ns <- NS(id)
   return(tagList(tabsetPanel(type = "tabs",
-
-    # --- Tab for generating report ---
-    tabPanel("generate report",
-    verbatimTextOutput(ns("execParamsDisplay")),
-    tags$br(),
-    if (id == "anneal") tagList(
-      checkboxInput(ns("bypass_clustering"),
-        label = "Skip Clustering",
-        value = FALSE
-      )
-    ),
-    actionButton(ns("generateButton"), "generate report"),
-
-    # Add a loading spinner while output is rendering
-    shinycssloaders::withSpinner(uiOutput(ns("spinnerOutput"))),
-
-    markdown(c(
-      "NOTE: please be patient after clicking this button. ",
-      "Rendering can take multiple minutes depending on settings."
-      )),
-    htmlOutput(ns("output"))
-    ),
-
+                             
     # --- Tab for advanced customization of report parameters ---
-    tabPanel("advanced configuration",
-      # fileInput(ns("inputFile"), "upload file here OR define configuration below.",
-      #   width = "100%",
-      #   accept = ".rds",
-      #   buttonLabel = "input file",
-      #   placeholder = glue("{id}_input.rds")
-      # ),
+    tabPanel("configuration",
       markdown(paste(
         "## (optional) report customization",
         sep=""
@@ -170,6 +142,28 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
         height = "15em",
         resize = "both"
       )
+    ),
+
+    # --- Tab for generating report ---
+    tabPanel("generate report",
+      verbatimTextOutput(ns("execParamsDisplay")),
+      tags$br(),
+      if (id == "anneal") tagList(
+        checkboxInput(ns("bypass_clustering"),
+          label = "Skip Clustering",
+          value = FALSE
+        )
+      ),
+      actionButton(ns("generateButton"), "generate report"),
+  
+      # Add a loading spinner while output is rendering
+      shinycssloaders::withSpinner(uiOutput(ns("spinnerOutput"))),
+  
+      markdown(c(
+        "NOTE: please be patient after clicking this button. ",
+        "Rendering can take multiple minutes depending on settings."
+        )),
+      htmlOutput(ns("output"))
     ),
 
     # --- Tab for downloading report files ---
