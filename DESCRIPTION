@@ -1,6 +1,6 @@
 Package: phytoclass.shiny.gui
 Title: What the Package Does (One Line, Title Case)
-Version: 0.0.3.1
+Version: 0.0.3.2
 Authors@R: 
     person("Tylar", "murray", , "murray.tylar@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8241-1919"))
