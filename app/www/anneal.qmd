@@ -2,6 +2,7 @@
 title: "Annealing"
 format:
   html:
+    self-contained: true
     code-fold: true
     standalone: true
 params:
@@ -236,59 +237,55 @@ print(Results$Figure)
 #| label: sankey-diagram
 #| code-summary: Sankey diagram of pigment flow into phytoplankton groups
 
-if (knitr::is_html_output()) {
+# Aggregate pigment totals across samples
+pigment_totals <- colSums(selectedCluster)
 
-  # Aggregate pigment totals across samples
-  pigment_totals <- colSums(selectedCluster)
+# Multiply by F matrix to allocate to classes
+F <- Results$`F matrix`
+common_pigments <- intersect(names(pigment_totals), colnames(F))
 
-  # Multiply by F matrix to allocate to classes
-  F <- Results$`F matrix`
-  common_pigments <- intersect(names(pigment_totals), colnames(F))
-
-  if (length(common_pigments) == 0) {
-    stop("No common pigments found between S and F matrix")
-  }
-
-  # Slice relevant portions
-  pigment_totals <- pigment_totals[common_pigments]
-  F <- F[, common_pigments, drop=FALSE]
-
-  # Compute pigment contribution to each phyto class
-  flow_matrix <- as.matrix(F) %*% diag(pigment_totals)
-  colnames(flow_matrix) <- names(pigment_totals)
-  flow_df <- as.data.frame(flow_matrix)
-  flow_df$class <- rownames(F)
-
-  # Convert wide to long format: pigment -> class, weight = value
-  sankey_data <- flow_df |>
-    tidyr::pivot_longer(
-      -class, 
-      names_to = "pigment", 
-      values_to = "value"
-    ) |>
-    filter(value > 0)
-
-  # Create node and link structure
-  nodes <- unique(c(sankey_data$pigment, sankey_data$class))
-  node_df <- data.frame(name = nodes)
-
-  sankey_data$source <- match(sankey_data$pigment, node_df$name) - 1
-  sankey_data$target <- match(sankey_data$class, node_df$name) - 1
-
-  # Render
-  sankeyNetwork(
-    Links = sankey_data[, c("source", "target", "value")],
-    Nodes = node_df,
-    Source = "source",
-    Target = "target",
-    Value = "value",
-    NodeID = "name",
-    fontSize = 12,
-    nodeWidth = 30,
-    sinksRight = FALSE
-  )
+if (length(common_pigments) == 0) {
+  stop("No common pigments found between S and F matrix")
 }
 
+# Slice relevant portions
+pigment_totals <- pigment_totals[common_pigments]
+F <- F[, common_pigments, drop=FALSE]
+
+# Compute pigment contribution to each phyto class
+flow_matrix <- as.matrix(F) %*% diag(pigment_totals)
+colnames(flow_matrix) <- names(pigment_totals)
+flow_df <- as.data.frame(flow_matrix)
+flow_df$class <- rownames(F)
+
+# Convert wide to long format: pigment -> class, weight = value
+sankey_data <- flow_df |>
+  tidyr::pivot_longer(
+    -class, 
+    names_to = "pigment", 
+    values_to = "value"
+  ) |>
+  filter(value > 0)
+
+# Create node and link structure
+nodes <- unique(c(sankey_data$pigment, sankey_data$class))
+node_df <- data.frame(name = nodes)
+
+sankey_data$source <- match(sankey_data$pigment, node_df$name) - 1
+sankey_data$target <- match(sankey_data$class, node_df$name) - 1
+
+# Render
+sankeyNetwork(
+  Links = sankey_data[, c("source", "target", "value")],
+  Nodes = node_df,
+  Source = "source",
+  Target = "target",
+  Value = "value",
+  NodeID = "name",
+  fontSize = 12,
+  nodeWidth = 30,
+  sinksRight = FALSE
+)
 ```
 
 ```{R}

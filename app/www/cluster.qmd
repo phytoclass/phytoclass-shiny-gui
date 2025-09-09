@@ -2,6 +2,7 @@
 title: "Cluster"
 format:
   html:
+    self-contained: true
     code-fold: true
     standalone: true
 params:
@@ -71,6 +72,24 @@ print(glue("cluster result saved to file {fname} on the server."))
 plot(result$cluster.plot)
 ```
 
+```{R}
+#| label: interactive-cluster-plot
+#| code-summary: Interactive cluster plot
+
+dendro_data <- ggdendro::dendro_data(result$cluster.plot)
+
+# Convert hclust to dendrogram data
+dendro_data <- ggdendro::dendro_data(result$cluster.plot)
+
+# Make a ggplot dendrogram
+p <- ggplot(segment(dendro_data)) +
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) +
+  theme_minimal() +
+  labs(title = "Cluster Dendrogram")
+
+# Convert to plotly
+plotly::ggplotly(p)
+```
 
 ```{R}
 #| label: cluster-count
