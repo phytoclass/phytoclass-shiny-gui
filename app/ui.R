@@ -7,7 +7,7 @@ ui <- fluidPage(
   title = "Phytoclass-App",
   # App title ----
   titlePanel(markdown(paste0(
-    "# Phytoplankton-From-Pigments GUI v0.0.3.2 \n",
+    "# Phytoplankton-From-Pigments GUI v1.0.0.0 \n",
     "This tool uses the [phytoclass R library](",
     "https://cran.r-project.org/web/packages/phytoclass/index.html",
     ") to estimate phytoplankton community composition from pigment data. \n",
