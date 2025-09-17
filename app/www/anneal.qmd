@@ -234,6 +234,12 @@ print(Results$Figure)
 ```
 
 ```{R}
+#| label: convergence plot
+#| code-summary: Display convergence plot
+Results$converge_plot
+```
+
+```{R}
 #| label: sankey-diagram
 #| code-summary: Sankey diagram of pigment flow into phytoplankton groups
 
