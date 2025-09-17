@@ -159,7 +159,7 @@ ui <- fluidPage(
     tags$div(
       style = "
         position: fixed;
-        bottom: 10px;
+        top: 10px;
         right: 15px;
         font-size: 16px;
         z-index: 9999;",
