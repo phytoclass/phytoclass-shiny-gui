@@ -17,6 +17,7 @@ params:
 ---
 
 ```{r echo=FALSE, results='asis'}
+
 library(glue)
 cat(glue("
 - **Input File**: `{params$inputFile}`  
@@ -34,6 +35,7 @@ cat(glue("
 #| code-summary: Load required library
 #| warning: false
 #| message: false
+#| echo: false
 
 library(glue)
 library(networkD3)
@@ -52,6 +54,7 @@ taxa <- readRDS(file.path(params$session_dir, params$taxaFile))
 ```{R}
 #| label: clean-taxa
 #| code-summary: Clean up taxa matrix if needed
+#| echo: false
 
 # === remove numeric rownames set by readRDS
 if (all(grepl("^[0-9]+$", rownames(taxa)))) {
@@ -85,6 +88,7 @@ if (length(dropped_colnames) > 0) {
 ```{R}
 #| label: prepare-s-matrix
 #| code-summary: Prepare S matrix
+#| echo: false
 
 if ("cluster.list" %in% names(input_data)) {
   # Using clustered data
@@ -113,6 +117,7 @@ if (is.character(selectedCluster[[1]]) && !anyDuplicated(selectedCluster[[1]])) 
 ```{R}
 #| label: validate-columns
 #| code-summary: Find mismatches between F and S
+#| echo: false
 
 # TODO: also check this for the min_max matrix
 # Assume taxa and selectedCluster are the two matrices
