@@ -12,6 +12,7 @@ params:
 ---
 
 ```{r echo=FALSE, results='asis'}
+
 library(glue)
 cat(glue("
 - **Input File**: `{params$inputFile}`  
@@ -22,8 +23,11 @@ cat(glue("
 ```{R}
 #| label: helper functions
 #| code-summary: Load required library
+#| echo: false
 
-library("glue")
+library(glue)
+library(ggplot2)
+library(tidyr)
 ```
 
 ```{R}
@@ -52,9 +56,6 @@ print(selectedCluster)
 #| code-summary: Plot histograms for each pigment in cluster
 
 df <- selectedCluster
-
-library(ggplot2)
-library(tidyr)
 
 # Convert df to a long format
 df_long <- pivot_longer(df, cols = everything(), 

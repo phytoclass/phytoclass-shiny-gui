@@ -13,6 +13,7 @@ params:
 ---
 
 ```{r echo=FALSE, results='asis'}
+
 library(glue)
 cat(glue("
 - **Input File**: `{params$inputFile}`  
@@ -24,6 +25,7 @@ cat(glue("
 ```{R}
 #| label: helper functions
 #| code-summary: Load required libraries
+#| echo: false
 
 suppressPackageStartupMessages({
   library(glue)
@@ -70,25 +72,6 @@ print(glue("cluster result saved to file {fname} on the server."))
 #| code-summary: Visualize the clustering result
 
 plot(result$cluster.plot)
-```
-
-```{R}
-#| label: interactive-cluster-plot
-#| code-summary: Interactive cluster plot
-
-dendro_data <- ggdendro::dendro_data(result$cluster.plot)
-
-# Convert hclust to dendrogram data
-dendro_data <- ggdendro::dendro_data(result$cluster.plot)
-
-# Make a ggplot dendrogram
-p <- ggplot(segment(dendro_data)) +
-  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) +
-  theme_minimal() +
-  labs(title = "Cluster Dendrogram")
-
-# Convert to plotly
-plotly::ggplotly(p)
 ```
 
 ```{R}
