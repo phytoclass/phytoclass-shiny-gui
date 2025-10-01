@@ -125,7 +125,7 @@ renderReport <- function(
 quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
   ns <- NS(id)
   return(tagList(tabsetPanel(type = "tabs",
-                             
+
     # --- Tab for advanced customization of report parameters ---
     tabPanel("configuration",
       markdown(paste(
@@ -155,10 +155,10 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
         )
       ),
       actionButton(ns("generateButton"), "generate report"),
-  
+
       # Add a loading spinner while output is rendering
       shinycssloaders::withSpinner(uiOutput(ns("spinnerOutput"))),
-  
+
       markdown(c(
         "NOTE: please be patient after clicking this button. ",
         "Rendering can take multiple minutes depending on settings."
@@ -168,7 +168,6 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
 
     # --- Tab for downloading report files ---
     tabPanel("download results",
-      # TODO:
       markdown("Use the buttons below to download results from the report."),
       # actionButton(ns("downloadRDSButton"), "download .rds"),
       downloadButton(ns("downloadHTMLButton"), "Download HTML"),
@@ -257,7 +256,7 @@ quartoReportServer <- function(id, session_dir = NULL){
       )
       reportGenerated(TRUE)
     })
-    
+
     # === Download Handler for HTML Report ===============================
     output$downloadHTMLButton <- downloadHandler(
       filename = function() {

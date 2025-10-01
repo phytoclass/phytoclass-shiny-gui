@@ -139,7 +139,7 @@ ui <- fluidPage(
               "pigment samples selected."
             )),
             quartoReportUI("anneal",
-              # TODO: fill these to match .qmd
+              # fill these to match .qmd
               defaultSetupCode = paste(
                 "inputFile <- 'clusters.rds'  # clustering results from Clustering Tab",
                 "taxaFile <- 'taxa.rds'  # taxa list (F matrix) for the analysis",
@@ -159,10 +159,10 @@ ui <- fluidPage(
     tags$div(
       style = "
         position: fixed;
-        bottom: 10px;
+        top: 10px;
         right: 15px;
         font-size: 16px;
         z-index: 9999;",
-      "Phytoclass v2.0.0"
+      glue("phytoclass v{packageVersion('phytoclass')}")
     )
 )
