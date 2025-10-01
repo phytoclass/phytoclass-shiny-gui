@@ -139,7 +139,7 @@ ui <- fluidPage(
               "pigment samples selected."
             )),
             quartoReportUI("anneal",
-              # TODO: fill these to match .qmd
+              # fill these to match .qmd
               defaultSetupCode = paste(
                 "inputFile <- 'clusters.rds'  # clustering results from Clustering Tab",
                 "taxaFile <- 'taxa.rds'  # taxa list (F matrix) for the analysis",
