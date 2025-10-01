@@ -30,6 +30,7 @@ cat(glue("
 #| code-summary: Load libraries, data
 #| warning: false
 #| message: false
+#| echo: false
 
 library(glue)
 library(networkD3)
@@ -44,7 +45,7 @@ taxa <- readRDS(file.path(params$session_dir, params$taxaFile))
 
 # === remove numeric rownames set by readRDS
 if (all(grepl("^[0-9]+$", rownames(taxa)))) {
-  print("dropping unneeded numeric index")
+  warning("dropping unneeded numeric index")
   # Set the first column as row names
   rownames(taxa) <- taxa[[1]]
   
@@ -177,7 +178,7 @@ set.seed(params$seed)
 
 Results <- phytoclass::simulated_annealing(
   S = selectedCluster,
-  Fmat = taxa,  # TODO: this isn't working?
+  Fmat = taxa,
   niter = params$niter,
   user_defined_min_max = min_max_table,
   verbose = FALSE
