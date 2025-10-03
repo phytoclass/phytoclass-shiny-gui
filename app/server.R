@@ -145,7 +145,7 @@ server <- function(input, output, session) {
 
   # Initialize with default min-max table
   minmax_data <- reactiveVal(phytoclass::min_max)
-  
+
   # When the min-max file is uploaded, read and store it
   observeEvent(input$minmax_file, {
     minmax_df <- get_df_from_file(input$minmax_file$datapath)
@@ -170,13 +170,14 @@ server <- function(input, output, session) {
       )
     )
   })
-  
+
   # Render the editable handsontable for min-max table
   output$minmax_table <- renderRHandsontable({
     req(minmax_data())
-    rhandsontable(minmax_data(), useTypes = TRUE, stretchH = "all")
+    rhandsontable(minmax_data(), useTypes = TRUE, stretchH = "right") %>%
+      hot_cols(manualColumnResize = TRUE)
   })
-  
+
   # Save edited min-max data to session when user clicks "Save Edits"
   observeEvent(input$save_minmax_edits, {
     updated <- hot_to_r(input$minmax_table)
