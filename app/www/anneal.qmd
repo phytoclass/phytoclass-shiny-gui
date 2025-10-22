@@ -17,6 +17,7 @@ params:
 ---
 
 ```{r echo=FALSE, results='asis'}
+
 library(glue)
 cat(glue("
 - **Selected Cluster**: `{params$selected_cluster}`  
@@ -40,6 +41,7 @@ library(pander)
 # Load input cluster and taxa matrices
 input_data <- readRDS(file.path(params$session_dir, params$inputFile))
 taxa <- readRDS(file.path(params$session_dir, params$taxaFile))
+
 
 # Clean up taxa matrix if needed
 
