@@ -20,10 +20,6 @@ params:
 
 library(glue)
 cat(glue("
-- **Input File**: `{params$inputFile}`  
-- **Taxa File**: `{params$taxaFile}`
-- **MinMax Table** {params$minMaxFile}
-- **Output File**: `{params$outputFile}`  
 - **Selected Cluster**: `{params$selected_cluster}`  
 - **Niter**: `{params$niter}`  
 - **Seed**: `{params$seed}`  
@@ -32,7 +28,7 @@ cat(glue("
 
 ```{R}
 #| label: helper functions
-#| code-summary: Load required library
+#| code-summary: Load libraries, data
 #| warning: false
 #| message: false
 #| echo: false
@@ -41,24 +37,17 @@ library(glue)
 library(networkD3)
 library(dplyr)
 library(pander)
-```
 
-```{R}
-#| label: load data
-#| code-summary: Load input cluster and taxa matrices
-
+# Load input cluster and taxa matrices
 input_data <- readRDS(file.path(params$session_dir, params$inputFile))
 taxa <- readRDS(file.path(params$session_dir, params$taxaFile))
-```
 
-```{R}
-#| label: clean-taxa
-#| code-summary: Clean up taxa matrix if needed
-#| echo: false
+
+# Clean up taxa matrix if needed
 
 # === remove numeric rownames set by readRDS
 if (all(grepl("^[0-9]+$", rownames(taxa)))) {
-  print("dropping unneeded numeric index")
+  warning("dropping unneeded numeric index")
   # Set the first column as row names
   rownames(taxa) <- taxa[[1]]
   
@@ -83,12 +72,8 @@ if (length(dropped_colnames) > 0) {
     )
   cat(paste(dropped_colnames, collapse = ", "), "\n")
 }
-```
 
-```{R}
-#| label: prepare-s-matrix
-#| code-summary: Prepare S matrix
-#| echo: false
+# Prepare S matrix
 
 if ("cluster.list" %in% names(input_data)) {
   # Using clustered data
@@ -101,23 +86,14 @@ if ("cluster.list" %in% names(input_data)) {
   # Using raw pigment matrix directly
   selectedCluster <- input_data
 }
-```
 
-```{R}
-#| label: restore-rownames
-#| code-summary: Restore sample names as rownames if present
-#| echo: false 
+# Restore sample names as rownames if present
 
 if (is.character(selectedCluster[[1]]) && !anyDuplicated(selectedCluster[[1]])) {
   rownames(selectedCluster) <- selectedCluster[[1]]
   selectedCluster <- selectedCluster[, -1, drop = FALSE]
 }
-```
-
-```{R}
-#| label: validate-columns
-#| code-summary: Find mismatches between F and S
-#| echo: false
+# Find mismatches between F and S
 
 # TODO: also check this for the min_max matrix
 # Assume taxa and selectedCluster are the two matrices
@@ -152,11 +128,8 @@ if (! length(common_headers) > 0){
   )
   stop("ERR: S and F matrix have different columns.")
 }
-```
 
-```{R}
-#| label: load-minmax
-#| code-summary: Load min-max table (custom or default)
+# Load min-max table (custom or default)
 
 # Start with the default min-max table from the phytoclass package
 min_max_table <- phytoclass::min_max
@@ -207,35 +180,20 @@ set.seed(params$seed)
 
 Results <- phytoclass::simulated_annealing(
   S = selectedCluster,
-  Fmat = taxa,  # TODO: this isn't working?
+  Fmat = taxa,
   niter = params$niter,
   user_defined_min_max = min_max_table,
   verbose = FALSE
 )
-```
 
-```{R, show results}
-#| label: show-results
-#| code-summary: Show results
-
-print(glue("
- completed w/ RMSE {Results$RMSE}
-"))
-
-print("Mean Absolute Error (MAE):")
-print(Results$MAE)
-# 
-print("F matrix:")
-print(Results$`F matrix`)
-
-pander(Results$`Class abundances`, digits = 6)
+# show-figure
+print(Results$Figure)
 ```
 
 ```{R}
-#| label: show-figure
-#| code-summary: Show figure from Results
-
-print(Results$Figure)
+#| label: convergence plot
+#| code-summary: Display convergence plot
+Results$converge_plot
 ```
 
 ```{R}
@@ -291,6 +249,22 @@ sankeyNetwork(
   nodeWidth = 30,
   sinksRight = FALSE
 )
+```
+
+```{R}
+#| code-label: Show results
+
+print(glue("
+ completed w/ RMSE {Results$RMSE}
+"))
+
+print("Mean Absolute Error (MAE):")
+print(Results$MAE)
+# 
+print("F matrix:")
+print(Results$`F matrix`)
+
+pander(Results$`Class abundances`, digits = 6)
 ```
 
 ```{R}

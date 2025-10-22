@@ -2,10 +2,6 @@
 GUI built using R.shiny for CHEMTAX and phytoclass users.
 
 TODO:
-* TEMPO_F is missing chlor_a on end
-* TEMPO_F want to try with Diatoms-a
-* code for matrix checking from anneal.qmd into phytoclass
-* taxa preset OR upload F matrix
 * add options to clustering
   * distanceType (manhattan etc)
 
