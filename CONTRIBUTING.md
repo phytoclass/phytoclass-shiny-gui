@@ -1,5 +1,3 @@
-This project is pretty small, so fork and PR whatever you want and let's chat.
-
 # Pushing a Release
 ## Versioning
 Version numbers are manually managed.
@@ -9,5 +7,7 @@ When a new release is ready:
 * set new version number in
   * DESCRIPTION
   * app/ui.R
+
 ## Shinyapps.io
-Use the RStudio "Publish Document" on app.R, ui.R, or server.R to push as `phytoclass-app`.
+1. Update packages : in an R console run `devtools::install()`, update all.
+2. Deploy to shinyapps.io : Use the RStudio "Publish Document" button on app.R, ui.R, or server.R to push as `phytoclass-app`.
