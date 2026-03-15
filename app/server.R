@@ -400,6 +400,45 @@ server <- function(input, output, session) {
       write.csv(selected_cluster_data, file, row.names = TRUE)
     }
   )
+  
+  output$downloadAllClusters <- downloadHandler(
+    filename = function() {
+      "all_clusters.zip"
+    },
+    content = function(file) {
+  
+      cluster_path <- file.path(session_dir, "clusters.rds")
+      req(file.exists(cluster_path))
+  
+      cluster_df <- readRDS(cluster_path)
+  
+      tmpdir <- tempdir()
+      oldwd <- setwd(tmpdir)
+      on.exit(setwd(oldwd))
+  
+      files <- c()
+  
+      for(i in seq_along(cluster_df$cluster.list)){
+  
+        cluster_data <- cluster_df$cluster.list[[i]]
+  
+        if ("Clust" %in% colnames(cluster_data)) {
+          cluster_data$Clust <- NULL
+        }
+  
+        is_numeric_col <- sapply(cluster_data, is.numeric)
+        cluster_data[is_numeric_col] <- lapply(cluster_data[is_numeric_col], round, digits = 4)
+  
+        fname <- paste0("cluster_", i, ".csv")
+  
+        write.csv(cluster_data, fname, row.names = TRUE)
+  
+        files <- c(files, fname)
+      }
+  
+      zip::zip(file, files = files)
+    }
+  )
 
   # ---- Session Cleanup ----
   # Deletes session folders older than 1 hour (3600 seconds)

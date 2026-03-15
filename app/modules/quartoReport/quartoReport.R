@@ -185,7 +185,10 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
           style = "margin-bottom: 30px;",
           tags$hr(),
           numericInput("downloadClusterIndex", "Cluster number to download:", value = 1, min = 1, step = 1),
-          downloadButton("downloadCluster", "Download Cluster CSV")
+          downloadButton("downloadCluster", "Download Cluster CSV"),
+          tags$br(),
+          tags$br(),
+          downloadButton("downloadAllClusters", "Download All Clusters (ZIP)")
         )
       }
     )
