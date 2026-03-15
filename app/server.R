@@ -151,6 +151,7 @@ server <- function(input, output, session) {
   output$pigments_table <- renderRHandsontable({
     req(pigments_data())
     disp <- make_editable(pigments_data())
+  
     rhandsontable(
       disp,
       rowHeaders = FALSE,
@@ -158,11 +159,13 @@ server <- function(input, output, session) {
       stretchH = "all"
     ) %>%
     hot_table(
-      contextMenu = TRUE,
-      allowInsertRow = TRUE,
-      allowInsertCol = TRUE,
-      allowRemoveRow = TRUE,
-      allowRemoveCol = TRUE
+      contextMenu = TRUE,        # Right-click menu (Excel-like)
+      allowInsertRow = TRUE,     # Add rows
+      allowInsertCol = TRUE,     # Add columns
+      allowRemoveRow = TRUE,     # Delete rows
+      allowRemoveCol = TRUE,     # Delete columns
+      manualRowMove = TRUE,      # Drag rows
+      manualColumnMove = TRUE    # Drag columns
     )
   })
 
@@ -210,6 +213,7 @@ server <- function(input, output, session) {
   output$taxa_table <- renderRHandsontable({
     req(taxalist_data())
     disp <- make_editable(taxalist_data())
+  
     rhandsontable(
       disp,
       rowHeaders = FALSE,
@@ -221,7 +225,9 @@ server <- function(input, output, session) {
       allowInsertRow = TRUE,
       allowInsertCol = TRUE,
       allowRemoveRow = TRUE,
-      allowRemoveCol = TRUE
+      allowRemoveCol = TRUE,
+      manualRowMove = TRUE,
+      manualColumnMove = TRUE
     )
   })
 
@@ -367,7 +373,11 @@ server <- function(input, output, session) {
   # === cluster download =================================
   output$downloadCluster <- downloadHandler(
     filename = function() {
-      paste0("cluster.csv")
+      paste0(
+        "cluster_",
+        input$downloadClusterIndex,
+        ".csv"
+      )
     },
     content = function(file) {
       cluster_path <- file.path(session_dir, "clusters.rds")
@@ -375,9 +385,8 @@ server <- function(input, output, session) {
       cluster_df <- readRDS(cluster_path)
 
       # Validate cluster exists
-      req(length(cluster_df$cluster.list) >= selected_cluster())
-
-      selected_cluster_data <- cluster_df$cluster.list[[selected_cluster()]]
+      req(length(cluster_df$cluster.list) >= input$downloadClusterIndex)
+      selected_cluster_data <- cluster_df$cluster.list[[input$downloadClusterIndex]]
 
       # Remove cluster column if exists
       if ("Clust" %in% colnames(selected_cluster_data)) {

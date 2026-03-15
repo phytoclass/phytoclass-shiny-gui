@@ -181,9 +181,11 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
         )
       },
       if (id == "inspectCluster") {
-        tagList(
+        div(
+          style = "margin-bottom: 30px;",
           tags$hr(),
-          downloadButton("downloadCluster", "Download Inspected Cluster CSV")
+          numericInput("downloadClusterIndex", "Cluster number to download:", value = 1, min = 1, step = 1),
+          downloadButton("downloadCluster", "Download Cluster CSV")
         )
       }
     )
