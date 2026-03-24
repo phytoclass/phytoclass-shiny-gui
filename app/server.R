@@ -221,7 +221,9 @@ server <- function(input, output, session) {
       # Show detailed report
       output[[output_id]] <- renderText({
         paste0(
-          "Matrix Check Completed\n\n",
+          "`do_matrix_checks` parameter is set to `FALSE` in the annealing report.\n",
+          "Matrix being checked for warning purposes only.\n",
+          "If the analysis fails later, consider these warnings.\n\n",
           "Columns that would be removed due to low values:\n",
           "- From S matrix: ", if (length(removed_S)) paste(removed_S, collapse = ", ") else "None", "\n",
           "- From F matrix: ", if (length(removed_F)) paste(removed_F, collapse = ", ") else "None", "\n\n",
