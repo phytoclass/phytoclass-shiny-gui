@@ -10,6 +10,82 @@ log_threshold(TRACE)
 source("R/get_df_from_file.R")
 source("modules/quartoReport/quartoReport.R")
 
+# ---- Handsontable helpers ----
+# Workaround: move them into the table body so they become editable cells.
+make_editable <- function(df){
+  # Preserve rownames (sample / taxa names)
+  rn <- rownames(df)
+  if(is.null(rn)){
+    rn <- ""
+  }
+  
+  # Convert values to character so cells remain editable
+  body <- as.data.frame(lapply(df, as.character), stringsAsFactors = FALSE)
+
+  # Insert rownames as first column and prepend editable header row
+  disp <- cbind(Row = rn, body)
+  header <- c("", colnames(df))
+  disp <- rbind(header, disp)
+
+  rownames(disp) <- NULL
+  as.data.frame(disp, stringsAsFactors = FALSE)
+}
+
+# Reconstruct original dataframe after editing in rhandsontable
+restore_df <- function(tbl){
+
+  # First row stores column names; first column stores rownames
+  coln <- as.character(tbl[1, -1])
+  rn   <- as.character(tbl[-1, 1])
+
+  body <- tbl[-1, -1, drop = FALSE]
+  colnames(body) <- coln
+
+  # Attempt numeric conversion for numeric columns
+  body <- lapply(body, function(x){
+    num <- suppressWarnings(as.numeric(x))
+    if(all(is.na(num) == FALSE | x == "")) num else x
+  })
+
+  df <- as.data.frame(body, check.names = FALSE)
+  rownames(df) <- rn
+  df
+}
+
+# ---- Matrix normalization helpers ----
+# Uploaded files may include ID columns instead of rownames.
+# These helpers standardize matrices before rendering.
+
+normalize_samples <- function(df){
+  first_name <- colnames(df)[1]
+
+  # If first column does not look like a pigment, treat it as sample IDs
+  pigment_like <- grepl("Per|Fuco|Pra|Zea|Tchla|Chl|X19", first_name)
+
+  if(!pigment_like){
+    ids <- make.unique(as.character(df[[1]]))
+    rownames(df) <- ids
+    df <- df[, -1, drop = FALSE]
+  }
+  df
+}
+
+
+normalize_taxa <- function(df){
+  if(ncol(df) == 0) return(df)
+  first_name <- colnames(df)[1]
+
+  # Same logic as samples: detect whether the first column holds taxa names
+  pigment_like <- grepl("Per|Fuco|Pra|Zea|Tchla|Chl|X19", first_name)
+
+  if(!pigment_like){
+    ids <- make.unique(as.character(df[[1]]))
+    rownames(df) <- ids
+    df <- df[, -1, drop = FALSE]
+  }
+  df
+}
+
 # Define server logic for app ----
 server <- function(input, output, session) {
 
@@ -44,11 +120,7 @@ server <- function(input, output, session) {
     # For example, reading a CSV file:
     pigment_df <- get_df_from_file(input$pigments_file$datapath)
 
-    # Set first column as row names if it contains character data
-    if (is.character(pigment_df[[1]])) {
-      rownames(pigment_df) <- pigment_df[[1]]
-      pigment_df <- pigment_df[, -1, drop = FALSE]
-    }
+    pigment_df <- normalize_samples(pigment_df)
 
     pigments_data(pigment_df)
     # TODO: validate
@@ -78,12 +150,29 @@ server <- function(input, output, session) {
   # Render the editable handsontable for pigments
   output$pigments_table <- renderRHandsontable({
     req(pigments_data())
-    rhandsontable(pigments_data(), useTypes = TRUE, stretchH = "all")
+    disp <- make_editable(pigments_data())
+  
+    rhandsontable(
+      disp,
+      rowHeaders = FALSE,
+      colHeaders = FALSE,
+      stretchH = "all"
+    ) %>%
+    hot_table(
+      contextMenu = TRUE,        # Right-click menu (Excel-like)
+      allowInsertRow = TRUE,     # Add rows
+      allowInsertCol = TRUE,     # Add columns
+      allowRemoveRow = TRUE,     # Delete rows
+      allowRemoveCol = TRUE,     # Delete columns
+      manualRowMove = TRUE,      # Drag rows
+      manualColumnMove = TRUE    # Drag columns
+    )
   })
 
   # When the save button is clicked, capture the edited table and save to session
   observeEvent(input$save_pigments_edits, {
-    updated <- hot_to_r(input$pigments_table)
+    raw <- hot_to_r(input$pigments_table)
+    updated <- restore_df(raw)
     pigments_data(updated)
     saveRDS(updated, file.path(session_dir, "pigments.rds"))
     log_trace("Pigment edits saved.")
@@ -97,15 +186,8 @@ server <- function(input, output, session) {
   # When the taxa file is uploaded, read it and store it
   observeEvent(input$taxalist_file, {
     taxalist_df <- get_df_from_file(input$taxalist_file$datapath)
-
-    # Set first column as row names if it contains character data
-    if (is.character(taxalist_df[[1]])) {
-      rownames(taxalist_df) <- taxalist_df[[1]]
-      taxalist_df <- taxalist_df[, -1, drop = FALSE]
-    }
-
+    taxalist_df <- normalize_taxa(taxalist_df)
     taxalist_data(taxalist_df)
-
     # TODO: generate more clever filepath
     saveRDS(taxalist_df, file.path(session_dir, "taxa.rds"))
   })
@@ -130,12 +212,29 @@ server <- function(input, output, session) {
   # Render the editable handsontable for taxa list
   output$taxa_table <- renderRHandsontable({
     req(taxalist_data())
-    rhandsontable(taxalist_data(), useTypes = TRUE, stretchH = "all")
+    disp <- make_editable(taxalist_data())
+  
+    rhandsontable(
+      disp,
+      rowHeaders = FALSE,
+      colHeaders = FALSE,
+      stretchH = "all"
+    ) %>%
+    hot_table(
+      contextMenu = TRUE,
+      allowInsertRow = TRUE,
+      allowInsertCol = TRUE,
+      allowRemoveRow = TRUE,
+      allowRemoveCol = TRUE,
+      manualRowMove = TRUE,
+      manualColumnMove = TRUE
+    )
   })
 
   # Save edited taxa data to session when user clicks "Save Edits"
   observeEvent(input$save_taxa_edits, {
-    updated <- hot_to_r(input$taxa_table)
+    raw <- hot_to_r(input$taxa_table)
+    updated <- restore_df(raw)
     taxalist_data(updated)
     saveRDS(updated, file.path(session_dir, "taxa.rds"))
     log_trace("Taxa list edits saved.")
@@ -149,6 +248,9 @@ server <- function(input, output, session) {
   # When the min-max file is uploaded, read and store it
   observeEvent(input$minmax_file, {
     minmax_df <- get_df_from_file(input$minmax_file$datapath)
+    if(any(minmax_df$min > minmax_df$max)){
+      stop("Min values cannot be larger than Max values")
+    }
     minmax_data(minmax_df)
     # TODO: validate the structure matches expected min-max format
     saveRDS(minmax_df, file.path(session_dir, "minmax.rds"))
@@ -273,17 +375,36 @@ server <- function(input, output, session) {
   # === cluster download =================================
   output$downloadCluster <- downloadHandler(
     filename = function() {
-      paste0("cluster.csv")
+      paste0(
+        "cluster_",
+        input$downloadClusterIndex,
+        ".csv"
+      )
     },
     content = function(file) {
       cluster_path <- file.path(session_dir, "clusters.rds")
-      req(file.exists(cluster_path))
+      
+      # Validate cluster file exists
+      if (!file.exists(cluster_path)) {
+        showNotification("Cluster data file not found. Please run clustering first.", 
+                        type = "error", duration = 5)
+        return(NULL)
+      }
+      
       cluster_df <- readRDS(cluster_path)
 
       # Validate cluster exists
-      req(length(cluster_df$cluster.list) >= selected_cluster())
-
-      selected_cluster_data <- cluster_df$cluster.list[[selected_cluster()]]
+      num_clusters <- length(cluster_df$cluster.list)
+      requested_index <- input$downloadClusterIndex
+      
+      if (requested_index < 1 || requested_index > num_clusters) {
+        showNotification(paste("Invalid cluster index:", requested_index, 
+                             "Valid range: 1 to", num_clusters), 
+                        type = "error", duration = 5)
+        return(NULL)
+      }
+      
+      selected_cluster_data <- cluster_df$cluster.list[[requested_index]]
 
       # Remove cluster column if exists
       if ("Clust" %in% colnames(selected_cluster_data)) {
@@ -295,6 +416,45 @@ server <- function(input, output, session) {
       selected_cluster_data[is_numeric_col] <- lapply(selected_cluster_data[is_numeric_col], round, digits = 4)
 
       write.csv(selected_cluster_data, file, row.names = TRUE)
+    }
+  )
+  
+  output$downloadAllClusters <- downloadHandler(
+    filename = function() {
+      "all_clusters.zip"
+    },
+    content = function(file) {
+  
+      cluster_path <- file.path(session_dir, "clusters.rds")
+      req(file.exists(cluster_path))
+  
+      cluster_df <- readRDS(cluster_path)
+  
+      tmpdir <- tempdir()
+      oldwd <- setwd(tmpdir)
+      on.exit(setwd(oldwd))
+  
+      files <- c()
+  
+      for(i in seq_along(cluster_df$cluster.list)){
+  
+        cluster_data <- cluster_df$cluster.list[[i]]
+  
+        if ("Clust" %in% colnames(cluster_data)) {
+          cluster_data$Clust <- NULL
+        }
+  
+        is_numeric_col <- sapply(cluster_data, is.numeric)
+        cluster_data[is_numeric_col] <- lapply(cluster_data[is_numeric_col], round, digits = 4)
+  
+        fname <- paste0("cluster_", i, ".csv")
+  
+        write.csv(cluster_data, fname, row.names = TRUE)
+  
+        files <- c(files, fname)
+      }
+  
+      zip::zip(file, files = files)
     }
   )
 
