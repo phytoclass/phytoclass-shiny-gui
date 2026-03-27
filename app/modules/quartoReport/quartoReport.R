@@ -177,13 +177,18 @@ quartoReportUI <- function(id, defaultSetupCode = "x <- 1"){
           tags$hr(),
           downloadButton(ns("downloadTaxaCSVButton"), "Download Taxa Estimates (.csv)"),
           downloadButton(ns("downloadFMatrixCSVButton"), "Download F Matrix (.csv)"),
-          downloadButton(ns("downloadMAECSVButton"), "Download MAE (.csv)")
+          downloadButton(ns("downloadMAECSVButton"), "Download Error Metrics (.csv)")
         )
       },
       if (id == "inspectCluster") {
-        tagList(
+        div(
+          style = "margin-bottom: 30px;",
           tags$hr(),
-          downloadButton("downloadCluster", "Download Inspected Cluster CSV")
+          numericInput("downloadClusterIndex", "Cluster number to download:", value = 1, min = 1, step = 1),
+          downloadButton("downloadCluster", "Download Cluster CSV"),
+          tags$br(),
+          tags$br(),
+          downloadButton("downloadAllClusters", "Download All Clusters (ZIP)")
         )
       }
     )
@@ -323,7 +328,7 @@ quartoReportServer <- function(id, session_dir = NULL){
     # === Download Handler for MAE Result ===============================
     output$downloadMAECSVButton <- downloadHandler(
       filename = function() {
-        paste0(id, "_MAE_", Sys.Date(), ".csv")
+        paste0(id, "_error_metrics_", Sys.Date(), ".csv")
       },
       content = function(file) {
         req(reportGenerated())

@@ -287,10 +287,27 @@ write.csv(Results$`F matrix`, file = fmatrix_csv_path, row.names = TRUE)
 ```
 
 ```{R}
-#| label: download-MAE
-#| code-summary: Prepare output MAE for download
+#| label: download-error-metrics
+#| code-summary: Prepare error metrics (MAE, RMSE, Relative MAE) for download
 #| echo: false
 
 MAE_csv_path <- file.path(params$session_dir, "MAE.csv")
-write.csv(Results$MAE, file = MAE_csv_path, row.names = TRUE)
+
+# Convert MAE to dataframe
+mae_df <- data.frame(MAE = Results$MAE)
+
+# Add RMSE column
+mae_df$RMSE <- Results$RMSE
+
+# Compute mean pigment values
+mean_vals <- colMeans(selectedCluster)
+
+# Match pigments safely
+rel_vals <- Results$MAE / pmax(mean_vals[names(Results$MAE)], 1e-9)
+
+# Add Relative MAE
+mae_df$Relative_MAE <- rel_vals
+
+# Save
+write.csv(mae_df, file = MAE_csv_path, row.names = TRUE)
 ```
