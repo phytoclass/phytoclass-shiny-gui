@@ -381,12 +381,28 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       cluster_path <- file.path(session_dir, "clusters.rds")
-      req(file.exists(cluster_path))
+      
+      # Validate cluster file exists
+      if (!file.exists(cluster_path)) {
+        showNotification("Cluster data file not found. Please run clustering first.", 
+                        type = "error", duration = 5)
+        return(NULL)
+      }
+      
       cluster_df <- readRDS(cluster_path)
 
       # Validate cluster exists
-      req(length(cluster_df$cluster.list) >= input$downloadClusterIndex)
-      selected_cluster_data <- cluster_df$cluster.list[[input$downloadClusterIndex]]
+      num_clusters <- length(cluster_df$cluster.list)
+      requested_index <- input$downloadClusterIndex
+      
+      if (requested_index < 1 || requested_index > num_clusters) {
+        showNotification(paste("Invalid cluster index:", requested_index, 
+                             "Valid range: 1 to", num_clusters), 
+                        type = "error", duration = 5)
+        return(NULL)
+      }
+      
+      selected_cluster_data <- cluster_df$cluster.list[[requested_index]]
 
       # Remove cluster column if exists
       if ("Clust" %in% colnames(selected_cluster_data)) {
