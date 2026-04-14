@@ -18,7 +18,7 @@ make_editable <- function(df){
   if(is.null(rn)){
     rn <- ""
   }
-  
+
   # Convert values to character so cells remain editable
   body <- as.data.frame(lapply(df, as.character), stringsAsFactors = FALSE)
 
@@ -151,7 +151,7 @@ server <- function(input, output, session) {
   output$pigments_table <- renderRHandsontable({
     req(pigments_data())
     disp <- make_editable(pigments_data())
-  
+
     rhandsontable(
       disp,
       rowHeaders = FALSE,
@@ -213,7 +213,7 @@ server <- function(input, output, session) {
   output$taxa_table <- renderRHandsontable({
     req(taxalist_data())
     disp <- make_editable(taxalist_data())
-  
+
     rhandsontable(
       disp,
       rowHeaders = FALSE,
@@ -326,7 +326,7 @@ server <- function(input, output, session) {
           "`do_matrix_checks` parameter is set to `FALSE` in the annealing report.\n",
           "Matrix being checked for warning purposes only.\n",
           "If the analysis fails later, consider these warnings.\n\n",
-          "Columns that would be removed due to low values:\n",
+          "Columns will be removed by matrix checks (see annealing report for details):\n",
           "- From S matrix: ", if (length(removed_S)) paste(removed_S, collapse = ", ") else "None", "\n",
           "- From F matrix: ", if (length(removed_F)) paste(removed_F, collapse = ", ") else "None", "\n\n",
           "Column name alignment:\n",
@@ -383,27 +383,27 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       cluster_path <- file.path(session_dir, "clusters.rds")
-      
+
       # Validate cluster file exists
       if (!file.exists(cluster_path)) {
-        showNotification("Cluster data file not found. Please run clustering first.", 
+        showNotification("Cluster data file not found. Please run clustering first.",
                         type = "error", duration = 5)
         return(NULL)
       }
-      
+
       cluster_df <- readRDS(cluster_path)
 
       # Validate cluster exists
       num_clusters <- length(cluster_df$cluster.list)
       requested_index <- input$downloadClusterIndex
-      
+
       if (requested_index < 1 || requested_index > num_clusters) {
-        showNotification(paste("Invalid cluster index:", requested_index, 
-                             "Valid range: 1 to", num_clusters), 
+        showNotification(paste("Invalid cluster index:", requested_index,
+                             "Valid range: 1 to", num_clusters),
                         type = "error", duration = 5)
         return(NULL)
       }
-      
+
       selected_cluster_data <- cluster_df$cluster.list[[requested_index]]
 
       # Remove cluster column if exists
@@ -418,42 +418,42 @@ server <- function(input, output, session) {
       write.csv(selected_cluster_data, file, row.names = TRUE)
     }
   )
-  
+
   output$downloadAllClusters <- downloadHandler(
     filename = function() {
       "all_clusters.zip"
     },
     content = function(file) {
-  
+
       cluster_path <- file.path(session_dir, "clusters.rds")
       req(file.exists(cluster_path))
-  
+
       cluster_df <- readRDS(cluster_path)
-  
+
       tmpdir <- tempdir()
       oldwd <- setwd(tmpdir)
       on.exit(setwd(oldwd))
-  
+
       files <- c()
-  
+
       for(i in seq_along(cluster_df$cluster.list)){
-  
+
         cluster_data <- cluster_df$cluster.list[[i]]
-  
+
         if ("Clust" %in% colnames(cluster_data)) {
           cluster_data$Clust <- NULL
         }
-  
+
         is_numeric_col <- sapply(cluster_data, is.numeric)
         cluster_data[is_numeric_col] <- lapply(cluster_data[is_numeric_col], round, digits = 4)
-  
+
         fname <- paste0("cluster_", i, ".csv")
-  
+
         write.csv(cluster_data, fname, row.names = TRUE)
-  
+
         files <- c(files, fname)
       }
-  
+
       zip::zip(file, files = files)
     }
   )
