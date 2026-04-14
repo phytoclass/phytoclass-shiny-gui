@@ -183,7 +183,7 @@ Results <- phytoclass::simulated_annealing(
   Fmat = taxa,
   niter = params$niter,
   user_defined_min_max = min_max_table,
-  do_matrix_checks = FALSE,  # Disable automatic filtering
+  do_matrix_checks = TRUE,
   verbose = FALSE
 )
 

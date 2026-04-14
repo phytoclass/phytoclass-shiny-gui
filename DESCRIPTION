@@ -1,9 +1,21 @@
 Package: phytoclass.shiny.gui
 Title: What the Package Does (One Line, Title Case)
-Version: 1.0.0.0
-Authors@R: 
-    person("Tylar", "murray", , "murray.tylar@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0001-8241-1919"))
+Version: 1.0.1.1
+Authors@R: c(person(
+    given="Tylar", family="Murray", role = c("aut", "cre"), email="email@tylar.info"
+  ), person(
+    given = "Mohd Aasim Maqsood", family = "Khan", role = c("aut")
+  ), person(
+    given="Alexander", family="Hayward", role = c("aut"), email = "phytoclass@outlook.com"
+  ), person(
+    given="Sebastian", family="Di Geronimo", role = c("ctb")
+  ), person(
+    given="Simon", family="Wright", role = c("ctb")
+  ), person(
+    given="Karen", famil="Westwood", role = c("ctb")
+  ), person(
+    given="Andy", family="McKenzie", role = c("ctb")
+  ))
 Description: This shiny app makes using phytoclass more accessible for non-programmers.
 License: `use_gpl3_license()`
 Encoding: UTF-8
@@ -16,6 +28,7 @@ Imports:
     glue,
     here,
     logger,
+    networkD3,
     pander,
     phytoclass,
     plotly,

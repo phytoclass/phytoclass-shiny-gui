@@ -7,7 +7,7 @@ ui <- fluidPage(
   title = "Phytoclass-App",
   # App title ----
   titlePanel(markdown(paste0(
-    "# Phytoplankton-From-Pigments GUI v1.0.0.1 \n",
+    "# Phytoplankton-From-Pigments GUI v1.0.1.1 \n",
     "This tool uses the [phytoclass R library](",
     "https://cran.r-project.org/web/packages/phytoclass/index.html",
     ") to estimate phytoplankton community composition from pigment data. \n",
@@ -16,7 +16,8 @@ ui <- fluidPage(
     'Hayward, Alexander, Tylar Murray, Sebastian Di Geronimo, Simon W. Wright, ',
     'Karen Westwood, Mohammad Aasim Khan, Andrés Gutiérrez‐Rodríguez, and ',
     'Matthew H. Pinkerton. "Phytoclass, Now with a GUI: Point‐and‐Click Pigment ',
-    'Chemotaxonomy." (2026).',
+    'Chemotaxonomy." Limnology and Oceanography Bulletin 35 (2026): 33-37.',
+    '[https://doi.org/10.1002/lob.70012](https://doi.org/10.1002/lob.70012)',
     '\n\n',
     'Hayward, Alexander, Matthew H. Pinkerton, and Andres Gutierrez‐Rodriguez.',
     '"phytoclass: A pigment‐based chemotaxonomic method to determine the biomass of phytoplankton classes." ',
